@@ -42,7 +42,7 @@ public class RentalRequestRepositoryTest {
         owner.setLastName("Owner");
         owner.setPhone("1234567893");
         owner.setEmail("rentalowner@example.com");
-        owner.setAfm("1234567893");
+        owner.setAfm("1234567898");
         owner.setRole(UserRole.OWNER);
         owner.setIdProof(ownerIdProof);
         AppUser savedOwner = appUserRepository.save(owner);
@@ -55,7 +55,7 @@ public class RentalRequestRepositoryTest {
         tenant.setLastName("Tenant");
         tenant.setPhone("1234567894");
         tenant.setEmail("rentaltenant@example.com");
-        tenant.setAfm("1234567894");
+        tenant.setAfm("1234567899");
         tenant.setRole(UserRole.TENANT);
         tenant.setIdProof(tenantIdProof);
         AppUser savedTenant = appUserRepository.save(tenant);

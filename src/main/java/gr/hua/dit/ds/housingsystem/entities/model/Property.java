@@ -5,7 +5,9 @@ import gr.hua.dit.ds.housingsystem.entities.enums.PropertyFeatures;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import java.util.List;
 import java.util.Set;
+
 
 @Entity
 @Data
@@ -56,7 +58,7 @@ public class Property {
     @Column(nullable = false)
     @Min(value = 1900, message = "Renovation year must be later than 1900.")
     @Max(value = 2100, message = "Renovation year must be earlier than 2100.")
-    private Integer renovationYear; // Formerly "renovationDate"
+    private Integer renovationYear;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "property_amenities", joinColumns = @JoinColumn(name = "property_id"))
@@ -64,7 +66,7 @@ public class Property {
     private Set<PropertyFeatures> amenities;
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Photo> photos; // Changed to a related entity
+    private Set<Photo> photos;
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
@@ -72,4 +74,7 @@ public class Property {
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ViewingRequest> viewingRequests;
+
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AvailabilitySlot> availabilitySlots;
 }

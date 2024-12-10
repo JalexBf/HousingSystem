@@ -39,9 +39,9 @@ public class ViewingRequestRepositoryTest {
         tenant.setPassword("password123");
         tenant.setFirstName("Test");
         tenant.setLastName("Tenant");
-        tenant.setPhone("1234567890");
+        tenant.setPhone("1234567333");
         tenant.setEmail("tenant@example.com");
-        tenant.setAfm("1234567891"); // Unique AFM
+        tenant.setAfm("1234567333"); // Unique AFM
         tenant.setRole(UserRole.TENANT);
         tenant.setIdProof(idProof);
         AppUser savedTenant = appUserRepository.save(tenant);
@@ -54,9 +54,9 @@ public class ViewingRequestRepositoryTest {
         owner.setPassword("password123");
         owner.setFirstName("Owner");
         owner.setLastName("Name");
-        owner.setPhone("1234567891");
+        owner.setPhone("1234567666");
         owner.setEmail("owner@example.com");
-        owner.setAfm("1234567892"); // Unique AFM
+        owner.setAfm("1234567333"); // Unique AFM
         owner.setRole(UserRole.OWNER);
         owner.setIdProof(ownerIdProof);
         AppUser savedOwner = appUserRepository.save(owner);

@@ -35,9 +35,9 @@ public class PropertyRepositoryTest {
         owner.setPassword("password123");
         owner.setFirstName("Owner");
         owner.setLastName("Name");
-        owner.setPhone("1234567890");
+        owner.setPhone("0987654321");
         owner.setEmail("owner@example.com");
-        owner.setAfm("1234567890");
+        owner.setAfm("0987654322");
         owner.setRole(UserRole.OWNER);
         owner.setIdProof(idProof);
         AppUser savedOwner = appUserRepository.save(owner);
@@ -72,9 +72,9 @@ public class PropertyRepositoryTest {
         owner.setPassword("password123");
         owner.setFirstName("Owner");
         owner.setLastName("Name");
-        owner.setPhone("1234567890");
+        owner.setPhone("0987654300");
         owner.setEmail("owner@example.com");
-        owner.setAfm("1234567890");
+        owner.setAfm("0987654300");
         owner.setRole(UserRole.OWNER);
         owner.setIdProof(idProof);
         AppUser savedOwner = appUserRepository.save(owner);
@@ -83,7 +83,7 @@ public class PropertyRepositoryTest {
         property.setCategory(PropertyCategory.APARTMENT);
         property.setArea("Downtown");
         property.setAddress("123 Main St");
-        property.setAtak("1234567890");
+        property.setAtak("0987654321");
         property.setPrice(1500.00);
         property.setSquareMeters(75);
         property.setFloor(2);
@@ -106,7 +106,7 @@ public class PropertyRepositoryTest {
         property.setCategory(PropertyCategory.APARTMENT);
         property.setArea("Test Area");
         property.setAddress("123 Test St");
-        property.setAtak("1234567890");
+        property.setAtak("1234567000");
         property.setPrice(1000.00);
         property.setSquareMeters(50);
         property.setFloor(1);

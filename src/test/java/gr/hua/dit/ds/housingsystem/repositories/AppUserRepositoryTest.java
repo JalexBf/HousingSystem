@@ -59,6 +59,7 @@ public class AppUserRepositoryTest {
     public void testSaveDuplicateUser() {
         byte[] idProof = "duplicate-user-proof".getBytes();
 
+        // First user
         AppUser user1 = new AppUser();
         user1.setUsername("duplicateuser");
         user1.setPassword("password123");
@@ -66,11 +67,12 @@ public class AppUserRepositoryTest {
         user1.setLastName("One");
         user1.setEmail("duplicate@example.com");
         user1.setPhone("1234567890");
-        user1.setAfm("1234567890");
+        user1.setAfm("1234567890");  // Duplicate AFM
         user1.setRole(UserRole.TENANT);
         user1.setIdProof(idProof);
-        appUserRepository.save(user1);
+        appUserRepository.save(user1);  // Save the first user
 
+        // Second user with the same AFM
         AppUser user2 = new AppUser();
         user2.setUsername("duplicateuser");
         user2.setPassword("password123");
@@ -78,10 +80,11 @@ public class AppUserRepositoryTest {
         user2.setLastName("Two");
         user2.setEmail("duplicate@example.com");
         user2.setPhone("0987654321");
-        user2.setAfm("0987654321");
+        user2.setAfm("1234567890");  // Same AFM as user1
         user2.setRole(UserRole.TENANT);
         user2.setIdProof(idProof);
 
+        // Assert that saving user2 throws a DataIntegrityViolationException
         assertThatThrownBy(() -> appUserRepository.save(user2))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }

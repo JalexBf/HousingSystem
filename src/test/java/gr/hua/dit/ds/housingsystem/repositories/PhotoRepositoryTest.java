@@ -39,7 +39,7 @@ public class PhotoRepositoryTest {
         owner.setLastName("Owner");
         owner.setPhone("1234567895");
         owner.setEmail("photoowner@example.com");
-        owner.setAfm("1234567895");
+        owner.setAfm("1234567899");
         owner.setRole(UserRole.OWNER);
         owner.setIdProof(ownerIdProof);
         AppUser savedOwner = appUserRepository.save(owner);

@@ -65,5 +65,15 @@ CREATE TABLE rental_requests (
 );
 
 
+CREATE TABLE availability_slot (
+                                   id SERIAL PRIMARY KEY,
+                                   property_id BIGINT NOT NULL,
+                                   start_time TIMESTAMP NOT NULL,
+                                   end_time TIMESTAMP NOT NULL,
+                                   CONSTRAINT fk_property FOREIGN KEY (property_id) REFERENCES property (id) ON DELETE CASCADE
+);
+
+
+
 ALTER TABLE user RENAME TO app_user;
 
