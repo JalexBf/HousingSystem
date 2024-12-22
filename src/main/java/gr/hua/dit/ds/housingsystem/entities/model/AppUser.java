@@ -39,9 +39,11 @@ public class AppUser {
     @Pattern(regexp = "^[0-9]{10}$", message = "AFM must be exactly 10 digits.")
     private String afm;
 
-    @Lob
-    @Column(nullable = false)
-    private byte[] idProof;
+    @Column(nullable = true) // Path to the front of the ID card
+    private String idFrontPath;
+
+    @Column(nullable = true) // Path to the back of the ID card
+    private String idBackPath;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

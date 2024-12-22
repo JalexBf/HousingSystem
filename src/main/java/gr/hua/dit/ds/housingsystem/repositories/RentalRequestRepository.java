@@ -2,6 +2,8 @@ package gr.hua.dit.ds.housingsystem.repositories;
 
 import gr.hua.dit.ds.housingsystem.entities.enums.RequestStatus;
 import gr.hua.dit.ds.housingsystem.entities.model.RentalRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,5 +19,8 @@ public interface RentalRequestRepository extends JpaRepository<RentalRequest, Lo
 
     // Find rental requests by status
     List<RentalRequest> findByStatus(RequestStatus status);
+
+    Page<RentalRequest> findByStatus(RequestStatus status, Pageable pageable);
+
 }
 

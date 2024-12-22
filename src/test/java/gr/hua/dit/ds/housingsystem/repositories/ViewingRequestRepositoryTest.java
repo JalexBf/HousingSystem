@@ -31,9 +31,7 @@ public class ViewingRequestRepositoryTest {
 
     @Test
     public void testSaveAndFindByStatus() {
-        byte[] idProof = "tenant-id-proof".getBytes(); // Placeholder binary data
-
-        // Create Tenant with a unique AFM
+        // Create Tenant with ID proof file paths
         AppUser tenant = new AppUser();
         tenant.setUsername("testtenant");
         tenant.setPassword("password123");
@@ -43,12 +41,11 @@ public class ViewingRequestRepositoryTest {
         tenant.setEmail("tenant@example.com");
         tenant.setAfm("1234567333"); // Unique AFM
         tenant.setRole(UserRole.TENANT);
-        tenant.setIdProof(idProof);
+        tenant.setIdFrontPath("uploads/idProofs/tenant-front-id.jpg");
+        tenant.setIdBackPath("uploads/idProofs/tenant-back-id.jpg");
         AppUser savedTenant = appUserRepository.save(tenant);
 
-        byte[] ownerIdProof = "owner-id-proof".getBytes();
-
-        // Create Owner with a unique AFM
+        // Create Owner with ID proof file paths
         AppUser owner = new AppUser();
         owner.setUsername("viewingowner");
         owner.setPassword("password123");
@@ -56,9 +53,10 @@ public class ViewingRequestRepositoryTest {
         owner.setLastName("Name");
         owner.setPhone("1234567666");
         owner.setEmail("owner@example.com");
-        owner.setAfm("1234567333"); // Unique AFM
+        owner.setAfm("1234567444"); // Unique AFM
         owner.setRole(UserRole.OWNER);
-        owner.setIdProof(ownerIdProof);
+        owner.setIdFrontPath("uploads/idProofs/owner-front-id.jpg");
+        owner.setIdBackPath("uploads/idProofs/owner-back-id.jpg");
         AppUser savedOwner = appUserRepository.save(owner);
 
         // Create Property owned by the unique owner
@@ -90,5 +88,4 @@ public class ViewingRequestRepositoryTest {
         assertThat(foundRequests).hasSize(1);
         assertThat(foundRequests.get(0).getProperty().getAddress()).isEqualTo("789 Oak St");
     }
-
 }

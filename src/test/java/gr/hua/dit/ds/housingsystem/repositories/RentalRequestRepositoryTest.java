@@ -31,10 +31,7 @@ public class RentalRequestRepositoryTest {
 
     @Test
     public void testSaveAndFindRentalRequests() {
-        byte[] ownerIdProof = "owner-id-proof".getBytes();
-        byte[] tenantIdProof = "tenant-id-proof".getBytes();
-
-        // Create Owner
+        // Create Owner with ID proof file paths
         AppUser owner = new AppUser();
         owner.setUsername("rentalowner");
         owner.setPassword("password123");
@@ -44,10 +41,11 @@ public class RentalRequestRepositoryTest {
         owner.setEmail("rentalowner@example.com");
         owner.setAfm("1234567898");
         owner.setRole(UserRole.OWNER);
-        owner.setIdProof(ownerIdProof);
+        owner.setIdFrontPath("uploads/idProofs/owner-front-id.jpg");
+        owner.setIdBackPath("uploads/idProofs/owner-back-id.jpg");
         AppUser savedOwner = appUserRepository.save(owner);
 
-        // Create Tenant
+        // Create Tenant with ID proof file paths
         AppUser tenant = new AppUser();
         tenant.setUsername("rentaltenant");
         tenant.setPassword("password123");
@@ -57,7 +55,8 @@ public class RentalRequestRepositoryTest {
         tenant.setEmail("rentaltenant@example.com");
         tenant.setAfm("1234567899");
         tenant.setRole(UserRole.TENANT);
-        tenant.setIdProof(tenantIdProof);
+        tenant.setIdFrontPath("uploads/idProofs/tenant-front-id.jpg");
+        tenant.setIdBackPath("uploads/idProofs/tenant-back-id.jpg");
         AppUser savedTenant = appUserRepository.save(tenant);
 
         // Create Property
@@ -92,8 +91,6 @@ public class RentalRequestRepositoryTest {
         assertThat(propertyRequests).hasSize(1);
         assertThat(propertyRequests.get(0).getTenant().getUsername()).isEqualTo("rentaltenant");
     }
-
-
-
 }
+
 

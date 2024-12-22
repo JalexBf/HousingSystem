@@ -77,4 +77,7 @@ public class Property {
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AvailabilitySlot> availabilitySlots;
+
+    @Column(nullable = false)
+    private boolean approved = false;
 }

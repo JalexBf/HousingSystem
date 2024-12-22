@@ -12,11 +12,11 @@ public class ViewingRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "tenant_id", nullable = false)
     private AppUser tenant;
 

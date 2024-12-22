@@ -27,10 +27,10 @@ public class PhotoRepositoryTest {
     @Autowired
     private AppUserRepository appUserRepository;
 
+
+
     @Test
     public void testSaveAndFindPhotosByProperty() {
-        byte[] ownerIdProof = "photo-owner-id-proof".getBytes();
-
         // Create Owner
         AppUser owner = new AppUser();
         owner.setUsername("photoowner");
@@ -41,7 +41,8 @@ public class PhotoRepositoryTest {
         owner.setEmail("photoowner@example.com");
         owner.setAfm("1234567899");
         owner.setRole(UserRole.OWNER);
-        owner.setIdProof(ownerIdProof);
+        owner.setIdFrontPath("uploads/idProofs/owner-front-id.jpg");
+        owner.setIdBackPath("uploads/idProofs/owner-back-id.jpg");
         AppUser savedOwner = appUserRepository.save(owner);
 
         // Create Property
@@ -61,21 +62,19 @@ public class PhotoRepositoryTest {
 
         // Create Photos
         Photo photo1 = new Photo();
-        photo1.setData("Photo 1".getBytes());
+        photo1.setFilePath("uploads/propertyPhotos/property-photo-1.jpg");
         photo1.setProperty(savedProperty);
         photoRepository.save(photo1);
 
         Photo photo2 = new Photo();
-        photo2.setData("Photo 2".getBytes());
+        photo2.setFilePath("uploads/propertyPhotos/property-photo-2.jpg");
         photo2.setProperty(savedProperty);
         photoRepository.save(photo2);
 
         // Fetch and Assert Photos
         List<Photo> foundPhotos = photoRepository.findByPropertyId(savedProperty.getId());
         assertThat(foundPhotos).hasSize(2);
-        assertThat(new String(foundPhotos.get(0).getData())).isEqualTo("Photo 1");
-        assertThat(new String(foundPhotos.get(1).getData())).isEqualTo("Photo 2");
+        assertThat(foundPhotos.get(0).getFilePath()).isEqualTo("uploads/propertyPhotos/property-photo-1.jpg");
+        assertThat(foundPhotos.get(1).getFilePath()).isEqualTo("uploads/propertyPhotos/property-photo-2.jpg");
     }
-
-
 }

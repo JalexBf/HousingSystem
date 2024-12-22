@@ -28,8 +28,7 @@ public class PropertyRepositoryTest {
 
     @Test
     public void testSaveAndFindPropertiesByOwner() {
-        byte[] idProof = "owner-id-proof".getBytes(); // Placeholder binary data
-
+        // Create Owner with ID proof file paths
         AppUser owner = new AppUser();
         owner.setUsername("propertyowner");
         owner.setPassword("password123");
@@ -39,9 +38,11 @@ public class PropertyRepositoryTest {
         owner.setEmail("owner@example.com");
         owner.setAfm("0987654322");
         owner.setRole(UserRole.OWNER);
-        owner.setIdProof(idProof);
+        owner.setIdFrontPath("uploads/idProofs/owner-front-id.jpg");
+        owner.setIdBackPath("uploads/idProofs/owner-back-id.jpg");
         AppUser savedOwner = appUserRepository.save(owner);
 
+        // Create Property
         Property property = new Property();
         property.setCategory(PropertyCategory.DETACHED_HOUSE);
         property.setArea("Suburb");
@@ -53,20 +54,19 @@ public class PropertyRepositoryTest {
         property.setNumberOfRooms(4);
         property.setNumberOfBathrooms(2);
         property.setRenovationYear(2018);
-        property.setOwner(savedOwner); // Set owner
+        property.setOwner(savedOwner); // Assign owner
 
         propertyRepository.save(property);
 
+        // Fetch and Verify Properties by Owner
         List<Property> foundProperties = propertyRepository.findByOwnerId(savedOwner.getId());
         assertThat(foundProperties).hasSize(1);
         assertThat(foundProperties.get(0).getAddress()).isEqualTo("456 Elm St");
     }
 
-
     @Test
     public void testFindByCategory() {
-        byte[] idProof = "owner-id-proof".getBytes(); // Placeholder binary data
-
+        // Create Owner with ID proof file paths
         AppUser owner = new AppUser();
         owner.setUsername("categoryowner");
         owner.setPassword("password123");
@@ -76,9 +76,11 @@ public class PropertyRepositoryTest {
         owner.setEmail("owner@example.com");
         owner.setAfm("0987654300");
         owner.setRole(UserRole.OWNER);
-        owner.setIdProof(idProof);
+        owner.setIdFrontPath("uploads/idProofs/category-front-id.jpg");
+        owner.setIdBackPath("uploads/idProofs/category-back-id.jpg");
         AppUser savedOwner = appUserRepository.save(owner);
 
+        // Create Property
         Property property = new Property();
         property.setCategory(PropertyCategory.APARTMENT);
         property.setArea("Downtown");
@@ -90,15 +92,15 @@ public class PropertyRepositoryTest {
         property.setNumberOfRooms(2);
         property.setNumberOfBathrooms(1);
         property.setRenovationYear(2020);
-        property.setOwner(savedOwner); // Assign the owner
+        property.setOwner(savedOwner); // Assign owner
 
         propertyRepository.save(property);
 
+        // Fetch and Verify Properties by Category
         List<Property> foundProperties = propertyRepository.findByCategory(PropertyCategory.APARTMENT);
         assertThat(foundProperties).hasSize(1);
         assertThat(foundProperties.get(0).getArea()).isEqualTo("Downtown");
     }
-
 
     @Test
     public void testSavePropertyWithMissingOwner() {
@@ -117,9 +119,4 @@ public class PropertyRepositoryTest {
         assertThatThrownBy(() -> propertyRepository.save(property))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
-
-
-
-
-
 }

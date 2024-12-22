@@ -10,9 +10,8 @@ public class Photo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
-    @Column(nullable = false)
-    private byte[] data; // Storing photo as binary data
+    @Column(nullable = false) // Path to the property photo file
+    private String filePath;
 
     @ManyToOne
     @JoinColumn(name = "property_id", nullable = false)

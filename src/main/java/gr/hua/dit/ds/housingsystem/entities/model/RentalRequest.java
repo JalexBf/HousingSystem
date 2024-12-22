@@ -11,13 +11,13 @@ public class RentalRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "tenant_id", nullable = false)
-    private AppUser tenant;
-
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "tenant_id", nullable = false)
+    private AppUser tenant;
 
     @Enumerated(EnumType.STRING)
     private RequestStatus status = RequestStatus.PENDING;
