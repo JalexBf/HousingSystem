@@ -4,23 +4,31 @@
   <title>Login</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
 </head>
 <body>
-<div>
-  <h2>Login</h2>
-  <form th:action="@{/login}" method="post">
-    <div>
-      <label>Username:</label>
-      <input type="text" name="username"/>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      <h2 class="text-center">Login</h2>
+      <div th:if="${param.error}" class="alert alert-danger mt-3">
+        Invalid username or password. Please try again.
+      </div>
+      <form th:action="@{/login}" method="post" class="mt-4">
+        <div class="mb-3">
+          <label class="form-label">Username:</label>
+          <input type="text" name="username" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password:</label>
+          <input type="password" name="password" class="form-control" required>
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+      </form>
     </div>
-    <div>
-      <label>Password:</label>
-      <input type="password" name="password"/>
-    </div>
-    <div>
-      <button type="submit">Login</button>
-    </div>
-  </form>
+  </div>
 </div>
 </body>
 </html>
