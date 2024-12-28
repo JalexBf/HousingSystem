@@ -17,4 +17,8 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 
     // Find properties owned by a specific user
     List<Property> findByOwnerId(Long ownerId);
+
+    // Retrieve properties pending approval
+    List<Property> findByApproved(boolean approved);
+
 }

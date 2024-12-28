@@ -47,7 +47,7 @@ public class PhotoRepositoryTest {
 
         // Create Property
         Property property = new Property();
-        property.setCategory(PropertyCategory.DETACHED_HOUSE);
+        property.setCategory(PropertyCategory.HOUSE);
         property.setArea("Photo Area");
         property.setAddress("123 Photo St");
         property.setAtak("1231231230");

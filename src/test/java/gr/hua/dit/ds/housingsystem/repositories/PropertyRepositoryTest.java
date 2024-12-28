@@ -44,7 +44,7 @@ public class PropertyRepositoryTest {
 
         // Create Property
         Property property = new Property();
-        property.setCategory(PropertyCategory.DETACHED_HOUSE);
+        property.setCategory(PropertyCategory.HOUSE);
         property.setArea("Suburb");
         property.setAddress("456 Elm St");
         property.setAtak("0987654321");

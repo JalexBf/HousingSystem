@@ -63,6 +63,7 @@ public class AppUserRepositoryTest {
 
 
 
+
     @Test
     public void testSaveUserWithMissingFields() {
         AppUser user = new AppUser();

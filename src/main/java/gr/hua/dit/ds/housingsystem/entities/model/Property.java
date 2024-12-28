@@ -30,7 +30,7 @@ public class Property {
 
     @Column(nullable = false, unique = true, length = 10)
     @Pattern(regexp = "^[0-9]{10}$", message = "ATAK must be exactly 10 digits.")
-    private String atak; // Formerly "registrationNumber"
+    private String atak;
 
     @Column(nullable = false)
     @Positive(message = "Price must be a positive number.")

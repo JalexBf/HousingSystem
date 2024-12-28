@@ -26,10 +26,11 @@ public class AppUserService {
 
 
     public void uploadIdImages(Long userId, MultipartFile idFront, MultipartFile idBack) throws IOException {
+        // Fetch the user
         AppUser user = appUserRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        // Validate files
+        // Validate file inputs
         if (idFront.isEmpty() || !idFront.getContentType().startsWith("image/")) {
             throw new IllegalArgumentException("Invalid front ID file");
         }
@@ -37,13 +38,17 @@ public class AppUserService {
             throw new IllegalArgumentException("Invalid back ID file");
         }
 
-        // Save files to the server
-        String frontPath = saveFile(idFront, userId, "front");
-        String backPath = saveFile(idBack, userId, "back");
+        // Save files with unique names
+        String directory = "uploads/idProofs/";
+        File frontFile = new File(directory + userId + "-front-id.jpg");
+        File backFile = new File(directory + userId + "-back-id.jpg");
+        frontFile.getParentFile().mkdirs();
+        idFront.transferTo(frontFile);
+        idBack.transferTo(backFile);
 
         // Update user entity with file paths
-        user.setIdFrontPath(frontPath);
-        user.setIdBackPath(backPath);
+        user.setIdFrontPath(frontFile.getPath());
+        user.setIdBackPath(backFile.getPath());
         appUserRepository.save(user);
     }
 
