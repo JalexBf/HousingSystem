@@ -73,7 +73,7 @@ public class PropertyRepositoryTest {
         owner.setFirstName("Owner");
         owner.setLastName("Name");
         owner.setPhone("0987654300");
-        owner.setEmail("owner@example.com");
+        owner.setEmail("owner1@example.com");
         owner.setAfm("0987654300");
         owner.setRole(UserRole.OWNER);
         owner.setIdFrontPath("uploads/idProofs/category-front-id.jpg");

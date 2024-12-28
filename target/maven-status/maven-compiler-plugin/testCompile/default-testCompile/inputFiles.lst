@@ -1,0 +1,10 @@
+/home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/HousingsystemApplicationTests.java
+/home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/repositories/AppUserRepositoryTest.java
+/home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/repositories/PhotoRepositoryTest.java
+/home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/repositories/PropertyRepositoryTest.java
+/home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/repositories/RentalRequestRepositoryTest.java
+/home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/repositories/ViewingRequestRepositoryTest.java
+/home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/services/AdminServiceTest.java
+/home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/services/PhotoServiceTest.java
+/home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/services/PropertyServiceTest.java
+/home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/services/ViewingAvailabilityTest.java

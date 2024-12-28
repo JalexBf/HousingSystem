@@ -52,7 +52,7 @@ public class ViewingRequestRepositoryTest {
         owner.setFirstName("Owner");
         owner.setLastName("Name");
         owner.setPhone("1234567666");
-        owner.setEmail("owner@example.com");
+        owner.setEmail("owner2@example.com");
         owner.setAfm("1234567444"); // Unique AFM
         owner.setRole(UserRole.OWNER);
         owner.setIdFrontPath("uploads/idProofs/owner-front-id.jpg");
@@ -63,7 +63,7 @@ public class ViewingRequestRepositoryTest {
         Property property = new Property();
         property.setCategory(PropertyCategory.APARTMENT);
         property.setArea("City Center");
-        property.setAddress("789 Oak St");
+        property.setAddress("aaa bbb ccc");
         property.setAtak("1122334455");
         property.setPrice(1800.00);
         property.setSquareMeters(90);
@@ -86,6 +86,6 @@ public class ViewingRequestRepositoryTest {
         // Fetch and Assert
         List<ViewingRequest> foundRequests = viewingRequestRepository.findByStatus(RequestStatus.PENDING);
         assertThat(foundRequests).hasSize(1);
-        assertThat(foundRequests.get(0).getProperty().getAddress()).isEqualTo("789 Oak St");
+        assertThat(foundRequests.get(0).getProperty().getAddress()).isEqualTo("aaa bbb ccc");
     }
 }

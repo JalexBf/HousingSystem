@@ -11,20 +11,18 @@ import org.apache.tika.Tika;
 public class PhotoService {
 
     public String uploadPhoto(MultipartFile file, String uploadDirectory, String prefix) throws IOException {
-        // Validate the file
-        validatePhoto(file);
+        validatePhoto(file); // Apply validation
+        String fileName = prefix + "-" + UUID.randomUUID() + "-" + file.getOriginalFilename();
+        String filePath = uploadDirectory + fileName;
 
-        // Create a unique file name
-        String uniqueFileName = prefix + "-" + UUID.randomUUID() + "-" + file.getOriginalFilename();
-        String filePath = uploadDirectory + uniqueFileName;
-
-        // Save the file to the specified directory
-        File destinationFile = new File(filePath);
-        destinationFile.getParentFile().mkdirs(); // Ensure directories exist
-        file.transferTo(destinationFile);
+        File dest = new File(filePath);
+        dest.getParentFile().mkdirs();
+        file.transferTo(dest);
 
         return filePath;
     }
+
+
 
     private void validatePhoto(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
