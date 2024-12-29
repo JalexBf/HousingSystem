@@ -1,4 +1,6 @@
 /home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/HousingsystemApplicationTests.java
+/home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/controllers/AdminControllerTest.java
+/home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/controllers/PropertyControllerTest.java
 /home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/repositories/AppUserRepositoryTest.java
 /home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/repositories/PhotoRepositoryTest.java
 /home/alexj/Desktop/housingsystem/src/test/java/gr/hua/dit/ds/housingsystem/repositories/PropertyRepositoryTest.java

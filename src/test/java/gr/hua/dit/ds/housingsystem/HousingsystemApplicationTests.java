@@ -2,12 +2,9 @@ package gr.hua.dit.ds.housingsystem;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-class HousingsystemApplicationTests {
-
-	@Test
-	void contextLoads() {
-	}
-
+@ActiveProfiles("test")
+public class HousingsystemApplicationTests {
 }

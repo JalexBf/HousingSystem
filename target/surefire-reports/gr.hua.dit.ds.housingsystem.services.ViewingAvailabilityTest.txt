@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: gr.hua.dit.ds.housingsystem.services.ViewingAvailabilityTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.096 s -- in gr.hua.dit.ds.housingsystem.services.ViewingAvailabilityTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.166 s -- in gr.hua.dit.ds.housingsystem.services.ViewingAvailabilityTest

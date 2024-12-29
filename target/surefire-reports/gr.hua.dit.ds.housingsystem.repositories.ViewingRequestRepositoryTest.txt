@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: gr.hua.dit.ds.housingsystem.repositories.ViewingRequestRepositoryTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.236 s -- in gr.hua.dit.ds.housingsystem.repositories.ViewingRequestRepositoryTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.275 s -- in gr.hua.dit.ds.housingsystem.repositories.ViewingRequestRepositoryTest

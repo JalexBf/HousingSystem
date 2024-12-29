@@ -1,5 +1,7 @@
 gr/hua/dit/ds/housingsystem/repositories/ViewingRequestRepositoryTest.class
+gr/hua/dit/ds/housingsystem/controllers/PropertyControllerTest.class
 gr/hua/dit/ds/housingsystem/repositories/PropertyRepositoryTest.class
+gr/hua/dit/ds/housingsystem/controllers/AdminControllerTest.class
 gr/hua/dit/ds/housingsystem/HousingsystemApplicationTests.class
 gr/hua/dit/ds/housingsystem/repositories/PhotoRepositoryTest.class
 gr/hua/dit/ds/housingsystem/repositories/RentalRequestRepositoryTest.class
