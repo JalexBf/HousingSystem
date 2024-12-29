@@ -1,10 +1,17 @@
-HELP.md
+# Ignore Maven build artifacts
 target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+*.jar
 
-### STS ###
+# Allow Maven Wrapper JAR
+!.mvn/wrapper/maven-wrapper.jar
+
+# Ignore IDE-specific files
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Ignore STS-specific files
 .apt_generated
 .classpath
 .factorypath
@@ -13,21 +20,19 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
+# Ignore NetBeans-specific files
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
+# Ignore VS Code-specific files
 .vscode/
+
+# Ignore Gradle build artifacts
+build/
+
+# Logs and temporary files
+*.log
+*.tmp

@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: gr.hua.dit.ds.housingsystem.services.PropertyServiceTest
--------------------------------------------------------------------------------
-Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in gr.hua.dit.ds.housingsystem.services.PropertyServiceTest
