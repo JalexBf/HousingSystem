@@ -21,4 +21,3 @@ public interface AvailabilitySlotRepository extends JpaRepository<AvailabilitySl
     @Query("SELECT a FROM AvailabilitySlot a WHERE a.property.id = :propertyId")
     List<AvailabilitySlot> findAllByPropertyId(@Param("propertyId") Long propertyId);
 }
-
