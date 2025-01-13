@@ -19,24 +19,25 @@ public class PropertyService {
     private final PhotoService photoService;
     private final PhotoRepository photoRepository;
 
+
     public PropertyService(PropertyRepository propertyRepository, PhotoService photoService, PhotoRepository photoRepository) {
         this.propertyRepository = propertyRepository;
         this.photoService = photoService;
         this.photoRepository = photoRepository;
     }
 
-    // Create or Update Property
+
     public Property saveProperty(Property property) {
         return propertyRepository.save(property);
     }
 
-    // Find a Property by ID
+
     public Property getPropertyById(Long propertyId) {
         return propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found with ID: " + propertyId));
     }
 
-    // Add Photos to a Property
+
     public void addPhotoToProperty(Long propertyId, MultipartFile file, String uploadDirectory, String prefix) throws IOException {
         Property property = getPropertyById(propertyId);
         String filePath = photoService.uploadPhoto(file, uploadDirectory, prefix);
@@ -48,33 +49,38 @@ public class PropertyService {
         photoRepository.save(photo);
     }
 
-    // Find Properties by Category
+
     public List<Property> getPropertiesByCategory(PropertyCategory category) {
         return propertyRepository.findByCategory(category);
     }
 
-    // Find Properties by Area
+
     public List<Property> getPropertiesByArea(String area) {
         return propertyRepository.findByAreaContaining(area);
     }
 
-    // Find Properties by Owner ID
+
     public List<Property> getPropertiesByOwner(Long ownerId) {
         return propertyRepository.findByOwnerId(ownerId);
     }
 
-    // Approve Property
+
     public void approveProperty(Long propertyId) {
         Property property = getPropertyById(propertyId);
         property.setApproved(true);
         propertyRepository.save(property);
     }
 
-    // Delete a Property
+
     public void deleteProperty(Long propertyId) {
         if (!propertyRepository.existsById(propertyId)) {
             throw new EntityNotFoundException("Property not found with ID: " + propertyId);
         }
         propertyRepository.deleteById(propertyId);
+    }
+
+
+    public List<Property> searchProperties(String category, Double minPrice, Double maxPrice, String location, Integer minRooms) {
+        return propertyRepository.searchProperties(category, minPrice, maxPrice, location, minRooms);
     }
 }

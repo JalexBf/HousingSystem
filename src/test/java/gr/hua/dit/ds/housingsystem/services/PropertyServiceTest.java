@@ -11,11 +11,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 
 class PropertyServiceTest {
 
@@ -26,6 +27,7 @@ class PropertyServiceTest {
     private PropertyRepository propertyRepository;
 
     private Property mockProperty;
+
 
     @BeforeEach
     void setUp() {
@@ -41,6 +43,7 @@ class PropertyServiceTest {
         mockProperty.setApproved(false);
     }
 
+
     @Test
     void saveProperty_ShouldSaveProperty() {
         when(propertyRepository.save(any(Property.class))).thenReturn(mockProperty);
@@ -51,6 +54,7 @@ class PropertyServiceTest {
         assertEquals(mockProperty.getId(), savedProperty.getId());
         verify(propertyRepository, times(1)).save(mockProperty);
     }
+
 
     @Test
     void getPropertyById_ShouldReturnProperty_WhenExists() {
@@ -63,6 +67,7 @@ class PropertyServiceTest {
         verify(propertyRepository, times(1)).findById(1L);
     }
 
+
     @Test
     void getPropertyById_ShouldThrowException_WhenNotExists() {
         when(propertyRepository.findById(1L)).thenReturn(Optional.empty());
@@ -70,6 +75,7 @@ class PropertyServiceTest {
         assertThrows(EntityNotFoundException.class, () -> propertyService.getPropertyById(1L));
         verify(propertyRepository, times(1)).findById(1L);
     }
+
 
     @Test
     void getPropertiesByCategory_ShouldReturnList() {
@@ -83,6 +89,7 @@ class PropertyServiceTest {
         assertEquals(1, properties.size());
         verify(propertyRepository, times(1)).findByCategory(PropertyCategory.APARTMENT);
     }
+
 
     @Test
     void approveProperty_ShouldSetApprovedAndSave() {
@@ -98,6 +105,7 @@ class PropertyServiceTest {
         assertTrue(approvedProperty.isApproved());
     }
 
+
     @Test
     void deleteProperty_ShouldDeleteProperty_WhenExists() {
         when(propertyRepository.existsById(1L)).thenReturn(true);
@@ -107,6 +115,7 @@ class PropertyServiceTest {
         verify(propertyRepository, times(1)).deleteById(1L);
     }
 
+
     @Test
     void deleteProperty_ShouldThrowException_WhenNotExists() {
         when(propertyRepository.existsById(1L)).thenReturn(false);
@@ -114,4 +123,7 @@ class PropertyServiceTest {
         assertThrows(EntityNotFoundException.class, () -> propertyService.deleteProperty(1L));
         verify(propertyRepository, never()).deleteById(1L);
     }
+
+
+
 }

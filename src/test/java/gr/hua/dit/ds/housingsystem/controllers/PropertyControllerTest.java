@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -22,6 +23,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.*;
+
 
 class PropertyControllerTest {
 
@@ -131,4 +134,43 @@ class PropertyControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Property approved successfully."));
     }
+
+
+    @Test
+    public void testSearchProperties() throws Exception {
+        // Mock data
+        Property property1 = new Property();
+        property1.setCategory(PropertyCategory.APARTMENT);
+        property1.setPrice(700.0);
+        property1.setAddress("Athens");
+
+        Property property2 = new Property();
+        property2.setCategory(PropertyCategory.APARTMENT);
+        property2.setPrice(800.0);
+        property2.setAddress("Athens");
+
+        List<Property> mockProperties = Arrays.asList(property1, property2);
+
+        // Stub the service method directly
+        when(propertyService.searchProperties("APARTMENT", 500.0, 1000.0, "Athens", 2))
+                .thenReturn(mockProperties);
+
+        // Perform the API request using MockMvc
+        mockMvc.perform(get("/api/properties/search")
+                        .param("category", "APARTMENT")
+                        .param("minPrice", "500")
+                        .param("maxPrice", "1000")
+                        .param("location", "Athens")
+                        .param("minRooms", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(2))
+                .andExpect(jsonPath("$[0].address").value("Athens"))
+                .andExpect(jsonPath("$[1].price").value(800.0));
+
+        // Verify that the service method was called exactly once
+        verify(propertyService, times(1)).searchProperties("APARTMENT", 500.0, 1000.0, "Athens", 2);
+    }
+
+
+
 }

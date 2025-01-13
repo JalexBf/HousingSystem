@@ -1,4 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE app_user (
                        id SERIAL PRIMARY KEY,
                        username VARCHAR(50) NOT NULL UNIQUE,
                        password TEXT NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE users (
                        email VARCHAR(255) NOT NULL UNIQUE,
                        afm CHAR(10) NOT NULL UNIQUE,
                        id_proof BYTEA NOT NULL,
-                       role VARCHAR(20) NOT NULL
+                       role user_role NOT NULL
 );
 
 
@@ -27,7 +27,7 @@ CREATE TABLE properties (
                             number_of_rooms INTEGER NOT NULL CHECK (number_of_rooms >= 1 AND number_of_rooms <= 10),
                             number_of_bathrooms INTEGER NOT NULL CHECK (number_of_bathrooms >= 1 AND number_of_bathrooms <= 10),
                             renovation_year INTEGER NOT NULL CHECK (renovation_year BETWEEN 1900 AND 2100),
-                            owner_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+                            owner_id INTEGER NOT NULL REFERENCES app_user(id) ON DELETE CASCADE
 );
 
 
@@ -51,7 +51,7 @@ CREATE TABLE photos (
 CREATE TABLE viewing_requests (
                                   id SERIAL PRIMARY KEY,
                                   property_id INTEGER NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
-                                  tenant_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                                  tenant_id INTEGER NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
                                   proposed_time TIMESTAMP NOT NULL,
                                   status VARCHAR(20) NOT NULL
 );
@@ -60,10 +60,18 @@ CREATE TABLE viewing_requests (
 CREATE TABLE rental_requests (
                                  id SERIAL PRIMARY KEY,
                                  property_id INTEGER NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
-                                 tenant_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                                 tenant_id INTEGER NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
                                  status VARCHAR(20) NOT NULL
 );
 
+CREATE TABLE notifications (
+                               id SERIAL PRIMARY KEY,
+                               user_id INTEGER NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+                               message TEXT NOT NULL,
+                               timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                               is_read BOOLEAN DEFAULT FALSE
+);
 
-ALTER TABLE user RENAME TO app_user;
+
+
 

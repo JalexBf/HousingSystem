@@ -2,25 +2,33 @@ package gr.hua.dit.ds.housingsystem.controllers;
 
 import gr.hua.dit.ds.housingsystem.entities.enums.PropertyCategory;
 import gr.hua.dit.ds.housingsystem.entities.model.Property;
+import gr.hua.dit.ds.housingsystem.repositories.PropertyRepository;
 import gr.hua.dit.ds.housingsystem.services.PropertyService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/properties")
 public class PropertyController {
 
+    @Autowired
     private final PropertyService propertyService;
+
+    @Autowired
+    private PropertyRepository propertyRepository;
+
 
     public PropertyController(PropertyService propertyService) {
         this.propertyService = propertyService;
     }
+
 
     @PostMapping
     public ResponseEntity<Property> createOrUpdateProperty(@RequestBody Property property) {
@@ -28,11 +36,13 @@ public class PropertyController {
         return new ResponseEntity<>(savedProperty, HttpStatus.CREATED);
     }
 
+
     @GetMapping("/{id}")
     public ResponseEntity<Property> getPropertyById(@PathVariable Long id) {
         Property property = propertyService.getPropertyById(id);
         return new ResponseEntity<>(property, HttpStatus.OK);
     }
+
 
     @PostMapping("/{id}/photos")
     public ResponseEntity<String> addPhotoToProperty(
@@ -48,11 +58,13 @@ public class PropertyController {
         }
     }
 
+
     @GetMapping("/category/{category}")
     public ResponseEntity<List<Property>> getPropertiesByCategory(@PathVariable PropertyCategory category) {
         List<Property> properties = propertyService.getPropertiesByCategory(category);
         return new ResponseEntity<>(properties, HttpStatus.OK);
     }
+
 
     @GetMapping("/area")
     public ResponseEntity<List<Property>> getPropertiesByArea(@RequestParam String area) {
@@ -60,17 +72,20 @@ public class PropertyController {
         return new ResponseEntity<>(properties, HttpStatus.OK);
     }
 
+
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<List<Property>> getPropertiesByOwner(@PathVariable Long ownerId) {
         List<Property> properties = propertyService.getPropertiesByOwner(ownerId);
         return new ResponseEntity<>(properties, HttpStatus.OK);
     }
 
+
     @PostMapping("/{id}/approve")
     public ResponseEntity<String> approveProperty(@PathVariable Long id) {
         propertyService.approveProperty(id);
         return new ResponseEntity<>("Property approved successfully.", HttpStatus.OK);
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProperty(@PathVariable Long id) {
@@ -81,4 +96,19 @@ public class PropertyController {
             return new ResponseEntity<>("Property not found: " + e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
+
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Property>> searchProperties(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Integer minRooms) {
+
+        // Delegate the call to the service layer
+        List<Property> properties = propertyService.searchProperties(category, minPrice, maxPrice, location, minRooms);
+        return ResponseEntity.ok(properties);
+    }
+
 }
