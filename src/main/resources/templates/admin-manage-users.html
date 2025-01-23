@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Manage Users (All Fields + Validation)</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Manage Users</h2>
+
+    <!-- Back to Admin Dashboard Button -->
+    <div class="mb-3">
+        <a href="/admin" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <!-- Buttons to show unapproved and approved users -->
+    <div class="mb-3">
+        <button class="btn btn-primary me-2" onclick="fetchUnapprovedUsers()">
+            Show Unapproved Users
+        </button>
+        <button class="btn btn-info" onclick="fetchApprovedUsers()">
+            Show Approved Users
+        </button>
+    </div>
+
+    <!-- UNAPPROVED USERS TABLE -->
+    <h4>Unapproved Users</h4>
+    <div class="table-responsive mb-5">
+        <table id="unapprovedUsersTable" class="table table-bordered">
+            <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- APPROVED USERS TABLE -->
+    <h4>Approved Users</h4>
+    <div class="table-responsive mb-3">
+        <table id="approvedUsersTable" class="table table-bordered">
+            <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Approved</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div id="updateUserFormContainer" style="display:none;" class="border p-3">
+        <h5>Update User</h5>
+        <form id="updateUserForm" onsubmit="submitUpdateForm(event)">
+            <input type="hidden" id="updateUserId" />
+
+            <div class="mb-3">
+                <label for="updateUserUsername" class="form-label">Username</label>
+                <input type="text" id="updateUserUsername" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label for="updateUserFirstName" class="form-label">First Name</label>
+                <input type="text" id="updateUserFirstName" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label for="updateUserLastName" class="form-label">Last Name</label>
+                <input type="text" id="updateUserLastName" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label for="updateUserEmail" class="form-label">Email</label>
+                <input type="text" id="updateUserEmail" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label for="updateUserPhone" class="form-label">Phone</label>
+                <input type="text" id="updateUserPhone" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label for="updateUserAfm" class="form-label">AFM</label>
+                <input type="text" id="updateUserAfm" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label for="updateUserRole" class="form-label">Role</label>
+                <select id="updateUserRole" class="form-select">
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="OWNER">OWNER</option>
+                    <option value="TENANT">TENANT</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="updateUserApproved" class="form-label">Approved</label>
+                <select id="updateUserApproved" class="form-select">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary me-2">Save</button>
+            <button type="button" class="btn btn-secondary" onclick="cancelUpdateForm()">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<script>
+
+    async function fetchUnapprovedUsers() {
+        const response = await fetch('/admin/unapprovedUsers');
+        const users = await response.json();
+        const tbody = document.getElementById('unapprovedUsersTable').querySelector('tbody');
+        tbody.innerHTML = '';
+
+        if (users.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td colspan="4" class="text-center text-muted">
+                    No unapproved users found.
+                </td>
+            `;
+            tbody.appendChild(row);
+            return;
+        }
+
+        users.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${user.id}</td>
+                <td>${user.username}</td>
+                <td>${user.email}</td>
+                <td>
+                    <button class="btn btn-success btn-sm me-1"
+                            onclick="approveUser(${user.id})">Approve</button>
+                    <button class="btn btn-warning btn-sm me-1"
+                            onclick="rejectUser(${user.id})">Reject</button>
+                    <button class="btn btn-danger btn-sm"
+                            onclick="deleteUnapprovedUser(${user.id})">Delete</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    async function approveUser(userId) {
+        const response = await fetch(`/admin/approveUser/${userId}`, { method: 'PUT' });
+        alert(await response.text());
+        fetchUnapprovedUsers();
+    }
+
+    async function rejectUser(userId) {
+        const response = await fetch(`/admin/rejectUser/${userId}`, { method: 'PUT' });
+        alert(await response.text());
+        fetchUnapprovedUsers();
+    }
+
+    async function deleteUnapprovedUser(userId) {
+        const response = await fetch(`/admin/deleteUser/${userId}`, { method: 'DELETE' });
+        alert(await response.text());
+        fetchUnapprovedUsers();
+    }
+
+
+    async function fetchApprovedUsers() {
+        const response = await fetch('/admin/approvedUsers');
+        const users = await response.json();
+        const tbody = document.getElementById('approvedUsersTable').querySelector('tbody');
+        tbody.innerHTML = '';
+
+        if (users.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td colspan="7" class="text-center text-muted">
+                    No approved users found.
+                </td>
+            `;
+            tbody.appendChild(row);
+            return;
+        }
+
+        users.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${user.id}</td>
+                <td>${user.username}</td>
+                <td>${user.email}</td>
+                <td>${user.phone ?? ''}</td>
+                <td>${user.role}</td>
+                <td>${user.approved ? 'Yes' : 'No'}</td>
+                <td>
+                    <button class="btn btn-info btn-sm me-1"
+                            onclick="showUpdateForm(
+                                ${user.id},
+                                '${escapeQuotes(user.username)}',
+                                '${escapeQuotes(user.firstName)}',
+                                '${escapeQuotes(user.lastName)}',
+                                '${escapeQuotes(user.email)}',
+                                '${escapeQuotes(user.phone)}',
+                                '${escapeQuotes(user.afm)}',
+                                '${user.role}',
+                                ${user.approved}
+                            )">
+                        Update
+                    </button>
+                    <button class="btn btn-danger btn-sm"
+                            onclick="deleteApprovedUser(${user.id})">
+                        Delete
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function escapeQuotes(str) {
+        if (!str) return '';
+        return str.replace(/'/g, "\\'");
+    }
+
+    function showUpdateForm(userId, username, firstName, lastName, email, phone, afm, role, approved) {
+        document.getElementById('updateUserId').value         = userId;
+        document.getElementById('updateUserUsername').value   = username;
+        document.getElementById('updateUserFirstName').value  = firstName;
+        document.getElementById('updateUserLastName').value   = lastName;
+        document.getElementById('updateUserEmail').value      = email;
+        document.getElementById('updateUserPhone').value      = phone;
+        document.getElementById('updateUserAfm').value        = afm;
+        document.getElementById('updateUserRole').value       = role;
+        document.getElementById('updateUserApproved').value   = approved ? "true" : "false";
+
+        document.getElementById('updateUserFormContainer').style.display = 'block';
+    }
+
+    function cancelUpdateForm() {
+        document.getElementById('updateUserFormContainer').style.display = 'none';
+    }
+
+
+    async function submitUpdateForm(event) {
+        event.preventDefault();
+
+        const userId     = document.getElementById('updateUserId').value;
+        const username   = document.getElementById('updateUserUsername').value.trim();
+        const firstName  = document.getElementById('updateUserFirstName').value.trim();
+        const lastName   = document.getElementById('updateUserLastName').value.trim();
+        const email      = document.getElementById('updateUserEmail').value.trim();
+        const phone      = document.getElementById('updateUserPhone').value.trim();
+        const afm        = document.getElementById('updateUserAfm').value.trim();
+        const role       = document.getElementById('updateUserRole').value;
+        const approved   = (document.getElementById('updateUserApproved').value === "true");
+
+        if (firstName.length < 3) {
+            alert("First name must be at least 3 characters.");
+            return;
+        }
+        if (lastName.length < 3) {
+            alert("Last name must be at least 3 characters.");
+            return;
+        }
+
+        const digitsRegex = /^[0-9]{10}$/;
+        if (!digitsRegex.test(phone)) {
+            alert("Phone must be exactly 10 digits (0-9).");
+            return;
+        }
+        if (!digitsRegex.test(afm)) {
+            alert("AFM must be exactly 10 digits (0-9).");
+            return;
+        }
+
+        const checkUrl = `/admin/checkUsername?username=${encodeURIComponent(username)}&excludeId=${userId}`;
+        const checkResp = await fetch(checkUrl);
+        const isUnique = await checkResp.json();
+        if (!isUnique) {
+            alert("Username is already taken by another user.");
+            return;
+        }
+
+        const updatedUser = {
+            username:   username,
+            firstName:  firstName,
+            lastName:   lastName,
+            email:      email,
+            phone:      phone,
+            afm:        afm,
+            role:       role,
+            approved:   approved
+        };
+
+        // Send PUT to updateUser
+        const response = await fetch(`/admin/updateUser/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedUser)
+        });
+
+        alert(await response.text());
+        cancelUpdateForm();
+        fetchApprovedUsers();
+    }
+
+    async function deleteApprovedUser(userId) {
+        const response = await fetch(`/admin/deleteUser/${userId}`, { method: 'DELETE' });
+        alert(await response.text());
+        fetchApprovedUsers();
+    }
+</script>
+</body>
+</html>
