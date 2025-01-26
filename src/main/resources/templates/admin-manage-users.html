@@ -42,6 +42,24 @@
         </table>
     </div>
 
+    <!-- USER DETAILS MODAL -->
+    <div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userDetailsModalLabel">User Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="userDetailsContent"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- APPROVED USERS TABLE -->
     <h4>Approved Users</h4>
     <div class="table-responsive mb-3">
@@ -145,16 +163,42 @@
                 <td>${user.username}</td>
                 <td>${user.email}</td>
                 <td>
+                    <button class="btn btn-primary btn-sm me-1"
+                            onclick="showUserDetails(${user.id})">View Details</button>
                     <button class="btn btn-success btn-sm me-1"
                             onclick="approveUser(${user.id})">Approve</button>
-                    <button class="btn btn-warning btn-sm me-1"
-                            onclick="rejectUser(${user.id})">Reject</button>
                     <button class="btn btn-danger btn-sm"
-                            onclick="deleteUnapprovedUser(${user.id})">Delete</button>
+                            onclick="rejectUser(${user.id})">Reject</button>
                 </td>
             `;
             tbody.appendChild(row);
         });
+    }
+
+    async function showUserDetails(userId) {
+        const response = await fetch(`/admin/userDetails/${userId}`);
+        const user = await response.json();
+
+        const userDetailsContent = `
+            <p><strong>ID:</strong> ${user.id}</p>
+            <p><strong>Username:</strong> ${user.username}</p>
+            <p><strong>First Name:</strong> ${user.firstName}</p>
+            <p><strong>Last Name:</strong> ${user.lastName}</p>
+            <p><strong>Email:</strong> ${user.email}</p>
+            <p><strong>Phone:</strong> ${user.phone}</p>
+            <p><strong>AFM:</strong> ${user.afm}</p>
+            <p><strong>Role:</strong> ${user.role}</p>
+            <p><strong>Approved:</strong> ${user.approved ? 'Yes' : 'No'}</p>
+            <p><strong>ID Front Photo:</strong></p>
+            <img src="/${user.idFrontPath}" class="img-fluid mb-3" alt="ID Front Photo">
+            <p><strong>ID Back Photo:</strong></p>
+            <img src="/${user.idBackPath}" class="img-fluid" alt="ID Back Photo">
+        `;
+
+        document.getElementById('userDetailsContent').innerHTML = userDetailsContent;
+
+        const userDetailsModal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+        userDetailsModal.show();
     }
 
     async function approveUser(userId) {
@@ -164,12 +208,6 @@
     }
 
     async function rejectUser(userId) {
-        const response = await fetch(`/admin/rejectUser/${userId}`, { method: 'PUT' });
-        alert(await response.text());
-        fetchUnapprovedUsers();
-    }
-
-    async function deleteUnapprovedUser(userId) {
         const response = await fetch(`/admin/deleteUser/${userId}`, { method: 'DELETE' });
         alert(await response.text());
         fetchUnapprovedUsers();

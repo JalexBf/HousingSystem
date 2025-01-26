@@ -89,5 +89,10 @@ public class AdminController {
         return adminService.isUsernameUnique(username, excludeId);
     }
 
+    @GetMapping("/userDetails/{userId}")
+    public ResponseEntity<AppUser> getUserDetails(@PathVariable Long userId) {
+        AppUser user = adminService.getUserById(userId);
+        return ResponseEntity.ok(user);
+    }
 
 }

@@ -19,16 +19,18 @@ public class RestConfiguration implements RepositoryRestConfigurer {
             RepositoryRestConfiguration config, CorsRegistry cors) {
 
         // Expose IDs for all entities
+        /*
         config.exposeIdsFor(AppUser.class);
         config.exposeIdsFor(Property.class);
         config.exposeIdsFor(RentalRequest.class);
         config.exposeIdsFor(ViewingRequest.class);
         config.exposeIdsFor(Photo.class);
+        */
 
-        // Configure CORS gia frontend
+        // Configure CORS for the frontend
         cors.addMapping("/**")
                 .allowedOrigins("http://localhost:5173")
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
     }

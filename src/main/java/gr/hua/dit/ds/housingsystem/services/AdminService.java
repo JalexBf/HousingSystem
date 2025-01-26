@@ -106,4 +106,9 @@ public class AdminService {
     }
 
 
+    public AppUser getUserById(Long userId) {
+        return appUserRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User with ID " + userId + " not found."));
+    }
+
 }
