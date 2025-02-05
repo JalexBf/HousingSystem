@@ -56,7 +56,6 @@ public class AuthController {
         log.info("Login attempt for username: {}", loginRequest.getUsername());
 
         try {
-            // Authentication logic
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(),
@@ -68,6 +67,8 @@ public class AuthController {
 
             // Generate JWT token
             String jwt = jwtUtils.generateJwtToken(authentication);
+
+            log.info("Generated JWT Token: {}", jwt);
 
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             List<String> roles = userDetails.getAuthorities()
