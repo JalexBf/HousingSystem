@@ -28,11 +28,7 @@ public class JwtUtils {
 
     @PostConstruct
     public void init() {
-        try {
-            this.decodedSecret = Base64.getUrlDecoder().decode(jwtSecret);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid Base64 key for JWT secret", e);
-        }
+        this.decodedSecret = jwtSecret.getBytes(); 
     }
 
     public String generateJwtToken(Authentication authentication) {

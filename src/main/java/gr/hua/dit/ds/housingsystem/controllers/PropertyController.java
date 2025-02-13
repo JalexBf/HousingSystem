@@ -1,11 +1,17 @@
 package gr.hua.dit.ds.housingsystem.controllers;
 
 import gr.hua.dit.ds.housingsystem.entities.enums.PropertyCategory;
+import gr.hua.dit.ds.housingsystem.entities.model.AppUser;
 import gr.hua.dit.ds.housingsystem.entities.model.Property;
+import gr.hua.dit.ds.housingsystem.repositories.AppUserRepository;
 import gr.hua.dit.ds.housingsystem.services.PropertyService;
+import gr.hua.dit.ds.housingsystem.services.UserDetailsImpl;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +23,8 @@ import java.util.List;
 public class PropertyController {
 
     private final PropertyService propertyService;
+    @Autowired
+    private AppUserRepository appUserRepository;
 
     public PropertyController(PropertyService propertyService) {
         this.propertyService = propertyService;
@@ -24,6 +32,17 @@ public class PropertyController {
 
     @PostMapping
     public ResponseEntity<Property> createOrUpdateProperty(@RequestBody Property property) {
+        // Get the authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        // Get the full user object from the database
+        AppUser owner = appUserRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        // Set the owner
+        property.setOwner(owner);
+
         Property savedProperty = propertyService.saveProperty(property);
         return new ResponseEntity<>(savedProperty, HttpStatus.CREATED);
     }
