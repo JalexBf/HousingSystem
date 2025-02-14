@@ -2,8 +2,11 @@ package gr.hua.dit.ds.housingsystem.controllers;
 
 import gr.hua.dit.ds.housingsystem.entities.enums.PropertyCategory;
 import gr.hua.dit.ds.housingsystem.entities.model.AppUser;
+import gr.hua.dit.ds.housingsystem.entities.model.AvailabilitySlot;
 import gr.hua.dit.ds.housingsystem.entities.model.Property;
 import gr.hua.dit.ds.housingsystem.repositories.AppUserRepository;
+import gr.hua.dit.ds.housingsystem.repositories.AvailabilitySlotRepository;
+import gr.hua.dit.ds.housingsystem.repositories.PropertyRepository;
 import gr.hua.dit.ds.housingsystem.services.PropertyService;
 import gr.hua.dit.ds.housingsystem.services.UserDetailsImpl;
 import jakarta.persistence.EntityNotFoundException;
@@ -14,8 +17,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,29 +28,61 @@ import java.util.List;
 public class PropertyController {
 
     private final PropertyService propertyService;
+
     @Autowired
     private AppUserRepository appUserRepository;
+
+    @Autowired
+    private PropertyRepository propertyRepository;
+
+    @Autowired
+    private AvailabilitySlotRepository availabilitySlotRepository;
+
 
     public PropertyController(PropertyService propertyService) {
         this.propertyService = propertyService;
     }
 
+
     @PostMapping
     public ResponseEntity<Property> createOrUpdateProperty(@RequestBody Property property) {
-        // Get the authenticated user
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication.getPrincipal() instanceof UserDetailsImpl)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Long ownerId = userDetails.getId();
 
-        // Get the full user object from the database
-        AppUser owner = appUserRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        // Set the owner
+        AppUser owner = appUserRepository.findById(ownerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         property.setOwner(owner);
 
-        Property savedProperty = propertyService.saveProperty(property);
+        if (property.getAvailabilitySlots() == null) {
+            property.setAvailabilitySlots(new ArrayList<>());
+        }
+
+        Property savedProperty = propertyService.saveProperty(property, ownerId);
         return new ResponseEntity<>(savedProperty, HttpStatus.CREATED);
     }
+
+
+    @PostMapping("/{id}/availability-slots")
+    public void addAvailabilitySlots(Long propertyId, List<AvailabilitySlot> slots) {
+        if (slots == null || slots.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one availability slot is required.");
+        }
+
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found."));
+
+        for (AvailabilitySlot slot : slots) {
+            slot.setProperty(property);
+            slot.validate();
+        }
+        availabilitySlotRepository.saveAll(slots);
+    }
+
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Property> getPropertyById(@PathVariable Long id) {

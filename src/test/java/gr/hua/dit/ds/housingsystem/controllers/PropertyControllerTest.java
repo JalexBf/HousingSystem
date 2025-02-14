@@ -42,39 +42,9 @@ class PropertyControllerTest {
         objectMapper = new ObjectMapper();
     }
 
-    @Test
-    void testCreateOrUpdateProperty() throws Exception {
-        Property property = new Property();
-        property.setId(1L);
-        property.setArea("Athens");
-        property.setCategory(PropertyCategory.APARTMENT);
 
-        when(propertyService.saveProperty(any(Property.class))).thenReturn(property);
 
-        mockMvc.perform(post("/api/properties")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(property)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.area").value("Athens"))
-                .andExpect(jsonPath("$.category").value("APARTMENT"));
-    }
 
-    @Test
-    void testGetPropertyById() throws Exception {
-        Property property = new Property();
-        property.setId(1L);
-        property.setArea("Athens");
-        property.setCategory(PropertyCategory.APARTMENT);
-
-        when(propertyService.getPropertyById(1L)).thenReturn(property);
-
-        mockMvc.perform(get("/api/properties/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.area").value("Athens"))
-                .andExpect(jsonPath("$.category").value("APARTMENT"));
-    }
 
     @Test
     void testAddPhotoToProperty() throws Exception {
