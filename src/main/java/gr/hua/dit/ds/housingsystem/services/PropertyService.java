@@ -10,14 +10,21 @@ import gr.hua.dit.ds.housingsystem.repositories.AvailabilitySlotRepository;
 import gr.hua.dit.ds.housingsystem.repositories.PhotoRepository;
 import gr.hua.dit.ds.housingsystem.repositories.PropertyRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+
 
 @Service
 public class PropertyService {
@@ -47,6 +54,7 @@ public class PropertyService {
         if (property.getAvailabilitySlots() != null) {
             property.getAvailabilitySlots().forEach(slot -> slot.setProperty(property));
         }
+
         return propertyRepository.save(property);
     }
 
@@ -57,15 +65,40 @@ public class PropertyService {
     }
 
 
+    @Transactional
     public void addPhotoToProperty(Long propertyId, MultipartFile file, String uploadDirectory, String prefix) throws IOException {
-        Property property = getPropertyById(propertyId);
-        String filePath = photoService.uploadPhoto(file, uploadDirectory, prefix);
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new EntityNotFoundException("Property not found"));
 
+        // Create upload directory in user's home
+        String userHome = System.getProperty("user.home");
+        String fullUploadPath = userHome + File.separator + "property_photos";
+        File directory = new File(fullUploadPath);
+        if (!directory.exists()) {
+            if (!directory.mkdirs()) {
+                throw new IOException("Failed to create directory: " + fullUploadPath);
+            }
+        }
+
+        String fileName = prefix + "_" + System.currentTimeMillis() + "_" + property.getId() +
+                "_" + file.getOriginalFilename();
+        File destinationFile = new File(directory, fileName);
+
+        // Save the file
+        file.transferTo(destinationFile);
+
+        // Create and save the photo entity
         Photo photo = new Photo();
-        photo.setFilePath(filePath);
+        photo.setFilePath(destinationFile.getAbsolutePath());
         photo.setProperty(property);
-
         photoRepository.save(photo);
+
+        // Add photo to property's photos collection
+        if (property.getPhotos() == null) {
+            property.setPhotos(new HashSet<>());
+        }
+        property.getPhotos().add(photo);
+        propertyRepository.save(property);
     }
 
 

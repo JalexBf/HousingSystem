@@ -46,13 +46,15 @@ public class PropertyController {
 
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Property> createOrUpdateProperty(
+    public ResponseEntity<?> createOrUpdateProperty(
             @RequestPart("property") Property property,
-            @RequestPart(value = "file", required = false) MultipartFile file) {
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication.getPrincipal() instanceof UserDetailsImpl)) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
+
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         Long ownerId = userDetails.getId();
 
@@ -64,18 +66,32 @@ public class PropertyController {
             property.setAvailabilitySlots(new ArrayList<>());
         }
 
-        // If file is included, you can handle it here
-        if (file != null && !file.isEmpty()) {
-            // Handle file storage logic (if needed)
-        }
         Property savedProperty = propertyService.saveProperty(property, ownerId);
-        return new ResponseEntity<>(savedProperty, HttpStatus.CREATED);
+
+        if (property.getAvailabilitySlots() != null && !property.getAvailabilitySlots().isEmpty()) {
+            propertyService.addAvailabilitySlots(savedProperty.getId(), property.getAvailabilitySlots());
+        }
+
+        System.out.println("Files received: " + (files != null ? files.size() : "null"));
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                System.out.println("Uploading file: " + file.getOriginalFilename());
+                try {
+                    propertyService.addPhotoToProperty(savedProperty.getId(), file, "property_photos", "property");
+                } catch (IOException e) {
+                    System.out.println("Error saving photo: " + e.getMessage());
+                    e.printStackTrace();
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Failed to save photos: " + e.getMessage());
+                }
+            }
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedProperty);
     }
 
 
-
     @PostMapping("/{id}/availability-slots")
-    public void addAvailabilitySlots(Long propertyId, List<AvailabilitySlot> slots) {
+    public void addAvailabilitySlots(@PathVariable Long propertyId, @RequestBody List<AvailabilitySlot> slots) {
         if (slots == null || slots.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one availability slot is required.");
         }

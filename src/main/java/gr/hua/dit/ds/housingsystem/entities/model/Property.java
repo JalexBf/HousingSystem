@@ -7,12 +7,16 @@ import gr.hua.dit.ds.housingsystem.entities.enums.PropertyFeatures;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class Property {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -67,8 +71,8 @@ public class Property {
     @Enumerated(EnumType.STRING)
     private Set<PropertyFeatures> amenities;
 
-    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Photo> photos;
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<Photo> photos = new HashSet<>();
 
     //@JsonBackReference
     @JsonIgnore
@@ -79,11 +83,24 @@ public class Property {
     @JsonIgnore
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ViewingRequest> viewingRequests;
-
-    @JsonIgnore
+    
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AvailabilitySlot> availabilitySlots;
 
     @Column(nullable = false)
     private boolean approved = false;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Property)) return false;
+        Property property = (Property) o;
+        return id != null && id.equals(property.id);
+    }
+
+    @Override
+    public int hashCode() {
+        // Use only id for hashCode
+        return getClass().hashCode();
+    }
 }
