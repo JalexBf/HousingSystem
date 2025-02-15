@@ -23,4 +23,3 @@ public interface RentalRequestRepository extends JpaRepository<RentalRequest, Lo
     Page<RentalRequest> findByStatus(RequestStatus status, Pageable pageable);
 
 }
-

@@ -5,7 +5,6 @@ import gr.hua.dit.ds.housingsystem.entities.enums.PropertyFeatures;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
-
 import java.util.List;
 import java.util.Set;
 

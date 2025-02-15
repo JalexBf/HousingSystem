@@ -54,24 +54,24 @@ public class AppUser {
     @Column(nullable = false)
     private boolean approved = false;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
-    @JoinTable(
-            name="rental_user",
-            joinColumns = @JoinColumn(name="appUser_id"),
-            inverseJoinColumns = @JoinColumn(name="rental_id"),
-            uniqueConstraints = @UniqueConstraint(columnNames = {"appUser_id", "rental_id"})
-    )
+//    @JoinTable(
+//            name="rental_user",
+//            joinColumns = @JoinColumn(name="appUser_id"),
+//            inverseJoinColumns = @JoinColumn(name="rental_id"),
+//            uniqueConstraints = @UniqueConstraint(columnNames = {"appUser_id", "rental_id"})
+//    )
     private Set<RentalRequest> rental;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
-    @JoinTable(
-            name="viewing_user",
-            joinColumns = @JoinColumn(name="appUser_id"),
-            inverseJoinColumns = @JoinColumn(name="viewing_id"),
-            uniqueConstraints = @UniqueConstraint(columnNames = {"appUser_id", "viewing_id"})
-    )
+//    @JoinTable(
+//            name="viewing_user",
+//            joinColumns = @JoinColumn(name="appUser_id"),
+//            inverseJoinColumns = @JoinColumn(name="viewing_id"),
+//            uniqueConstraints = @UniqueConstraint(columnNames = {"appUser_id", "viewing_id"})
+//    )
     private Set<ViewingRequest> viewing;
 
     public AppUser() {
@@ -179,6 +179,3 @@ public class AppUser {
     }
 
 }
-
-
-

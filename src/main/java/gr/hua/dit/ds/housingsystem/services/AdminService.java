@@ -68,6 +68,27 @@ public class AdminService {
         AppUser user = appUserRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
+        if (updatedUser.getIdFrontPath() == null) {
+            updatedUser.setIdFrontPath(user.getIdFrontPath());
+        }
+        if (updatedUser.getIdBackPath() == null) {
+            updatedUser.setIdBackPath(user.getIdBackPath());
+        }
+
+        if (!isUsernameUnique(updatedUser.getUsername(), userId)) {
+            throw new IllegalArgumentException("Username is already taken.");
+        }
+        if (!isEmailUnique(updatedUser.getEmail(), userId)) {
+            throw new IllegalArgumentException("Email is already taken.");
+        }
+
+        if (!updatedUser.getPhone().matches("\\d{10}")) {
+            throw new IllegalArgumentException("Phone must be exactly 10 digits.");
+        }
+        if (!updatedUser.getAfm().matches("\\d{10}")) {
+            throw new IllegalArgumentException("AFM must be exactly 10 digits.");
+        }
+
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
         user.setPhone(updatedUser.getPhone());
@@ -78,6 +99,7 @@ public class AdminService {
 
         appUserRepository.save(user);
     }
+
 
 
     public List<AppUser> getUnapprovedUsers() {
@@ -109,6 +131,22 @@ public class AdminService {
     public AppUser getUserById(Long userId) {
         return appUserRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User with ID " + userId + " not found."));
+    }
+
+    public boolean isEmailUnique(String email, Long excludeId) {
+        Optional<AppUser> optionalUser = appUserRepository.findByEmail(email);
+
+        if (!optionalUser.isPresent()) {
+            return true;
+        }
+
+        AppUser existing = optionalUser.get();
+
+        if (excludeId != null && existing.getId().equals(excludeId)) {
+            return true;
+        }
+
+        return false;
     }
 
 }

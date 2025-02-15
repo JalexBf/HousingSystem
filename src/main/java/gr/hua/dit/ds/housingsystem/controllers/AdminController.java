@@ -5,13 +5,11 @@ import gr.hua.dit.ds.housingsystem.entities.model.Property;
 import gr.hua.dit.ds.housingsystem.services.AdminService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Map;
 
 
 @Controller
@@ -90,12 +88,23 @@ public class AdminController {
     }
 
     @GetMapping("/checkUsername")
-    public boolean isUsernameUnique(
+    public ResponseEntity<Boolean> isUsernameUnique(
             @RequestParam String username,
             @RequestParam(required=false) Long excludeId
     ) {
-        return adminService.isUsernameUnique(username, excludeId);
+        boolean isUnique = adminService.isUsernameUnique(username, excludeId);
+        return ResponseEntity.ok(isUnique);
     }
+
+    @GetMapping("/checkEmail")
+    public ResponseEntity<Boolean> isEmailUnique(
+            @RequestParam String email,
+            @RequestParam(required = false) Long excludeId) {
+
+        boolean isUnique = adminService.isEmailUnique(email, excludeId);
+        return ResponseEntity.ok(isUnique);
+    }
+
 
     @GetMapping("/userDetailsPage/{userId}")
     public String userDetailsPage(@PathVariable Long userId, Model model) {

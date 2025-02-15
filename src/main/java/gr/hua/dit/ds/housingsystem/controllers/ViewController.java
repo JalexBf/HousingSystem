@@ -45,11 +45,10 @@ public class ViewController {
         return "admin-manage-users";
     }
 
-    @GetMapping("/admin/view-requests")
+    @GetMapping("/admin/manage-properties")
     public String viewRequests() {
         return "admin-view-requests";
     }
-
 
 
 }

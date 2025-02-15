@@ -12,6 +12,7 @@
 <div class="container mt-5">
   <h2 class="text-center mb-4">Property Requests</h2>
 
+  <!-- Back to Admin Dashboard Button -->
   <div class="mb-3">
     <a href="/admin" class="btn btn-secondary">Back to Dashboard</a>
   </div>
@@ -30,12 +31,31 @@
       <tr>
         <th>ID</th>
         <th>Address</th>
+        <th>Price</th>
         <th>Status</th>
         <th>Actions</th>
       </tr>
       </thead>
       <tbody></tbody>
     </table>
+  </div>
+
+  <!-- PROPERTY DETAILS MODAL -->
+  <div class="modal fade" id="propertyDetailsModal" tabindex="-1" aria-labelledby="propertyDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="propertyDetailsModalLabel">Property Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="propertyDetailsContent"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -49,7 +69,7 @@
     if (properties.length === 0) {
       const row = document.createElement('tr');
       row.innerHTML = `
-                <td colspan="4" class="text-center text-muted">
+                <td colspan="5" class="text-center text-muted">
                     No unapproved properties found.
                 </td>
             `;
@@ -62,14 +82,44 @@
       row.innerHTML = `
                 <td>${prop.id}</td>
                 <td>${prop.address}</td>
+                <td>${prop.price} €</td>
                 <td>${prop.approved ? 'Approved' : 'Unapproved'}</td>
                 <td>
-                    <button class="btn btn-success btn-sm me-1" onclick="approveProperty(${prop.id})">Approve</button>
-                    <button class="btn btn-danger btn-sm" onclick="rejectProperty(${prop.id})">Reject</button>
+                    <button class="btn btn-primary btn-sm me-1"
+                            onclick="showPropertyDetails(${prop.id})">View Details</button>
+                    <button class="btn btn-success btn-sm me-1"
+                            onclick="approveProperty(${prop.id})">Approve</button>
+                    <button class="btn btn-danger btn-sm"
+                            onclick="rejectProperty(${prop.id})">Reject</button>
                 </td>
             `;
       tbody.appendChild(row);
     });
+  }
+
+  async function showPropertyDetails(propertyId) {
+    const response = await fetch(`/admin/propertyDetails/${propertyId}`);
+    const prop = await response.json();
+
+    const propertyDetailsContent = `
+            <p><strong>ID:</strong> ${prop.id}</p>
+            <p><strong>Address:</strong> ${prop.address}</p>
+            <p><strong>Area:</strong> ${prop.area} m²</p>
+            <p><strong>Price:</strong> ${prop.price} €</p>
+            <p><strong>Number of Rooms:</strong> ${prop.numberOfRooms}</p>
+            <p><strong>Number of Bathrooms:</strong> ${prop.numberOfBathrooms}</p>
+            <p><strong>Floor:</strong> ${prop.floor}</p>
+            <p><strong>Renovation Year:</strong> ${prop.renovationYear}</p>
+            <p><strong>Status:</strong> ${prop.approved ? 'Approved' : 'Unapproved'}</p>
+            <p><strong>Amenities:</strong> ${prop.amenities.join(', ') || 'None'}</p>
+            <p><strong>Images:</strong></p>
+            ${prop.photos.map(photo => `<img src="/${photo}" class="img-fluid mb-3" alt="Property Image">`).join('')}
+        `;
+
+    document.getElementById('propertyDetailsContent').innerHTML = propertyDetailsContent;
+
+    const propertyDetailsModal = new bootstrap.Modal(document.getElementById('propertyDetailsModal'));
+    propertyDetailsModal.show();
   }
 
   async function approveProperty(propertyId) {
@@ -77,7 +127,7 @@
       method: 'PUT'
     });
     alert(await response.text());
-    fetchUnapprovedProperties();
+    window.location.href = "/admin/manage-properties";
   }
 
   async function rejectProperty(propertyId) {
@@ -85,7 +135,7 @@
       method: 'DELETE'
     });
     alert(await response.text());
-    fetchUnapprovedProperties();
+    window.location.href = "/admin/manage-properties";
   }
 </script>
 </body>
