@@ -176,30 +176,10 @@
     }
 
     async function showUserDetails(userId) {
-        const response = await fetch(`/admin/userDetails/${userId}`);
-        const user = await response.json();
-
-        const userDetailsContent = `
-            <p><strong>ID:</strong> ${user.id}</p>
-            <p><strong>Username:</strong> ${user.username}</p>
-            <p><strong>First Name:</strong> ${user.firstName}</p>
-            <p><strong>Last Name:</strong> ${user.lastName}</p>
-            <p><strong>Email:</strong> ${user.email}</p>
-            <p><strong>Phone:</strong> ${user.phone}</p>
-            <p><strong>AFM:</strong> ${user.afm}</p>
-            <p><strong>Role:</strong> ${user.role}</p>
-            <p><strong>Approved:</strong> ${user.approved ? 'Yes' : 'No'}</p>
-            <p><strong>ID Front Photo:</strong></p>
-            <img src="/${user.idFrontPath}" class="img-fluid mb-3" alt="ID Front Photo">
-            <p><strong>ID Back Photo:</strong></p>
-            <img src="/${user.idBackPath}" class="img-fluid" alt="ID Back Photo">
-        `;
-
-        document.getElementById('userDetailsContent').innerHTML = userDetailsContent;
-
-        const userDetailsModal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
-        userDetailsModal.show();
+        window.location.href = `/admin/userDetailsPage/${userId}`;
     }
+
+
 
     async function approveUser(userId) {
         const response = await fetch(`/admin/approveUser/${userId}`, { method: 'PUT' });

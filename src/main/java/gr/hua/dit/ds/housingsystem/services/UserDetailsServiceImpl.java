@@ -15,6 +15,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     AppUserRepository userRepository;
 
+    @Transactional
+    public UserDetails loadUserById(Long id) throws UsernameNotFoundException {
+        if (id == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+
+        AppUser user = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with ID: " + id));
+
+        return UserDetailsImpl.build(user);
+    }
+
+
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -23,6 +36,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         return UserDetailsImpl.build(user);
     }
+
 
     public void saveUser(AppUser user) {
         userRepository.save(user);
