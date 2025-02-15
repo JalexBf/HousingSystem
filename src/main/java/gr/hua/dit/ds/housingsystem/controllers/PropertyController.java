@@ -12,6 +12,7 @@ import gr.hua.dit.ds.housingsystem.services.UserDetailsImpl;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,8 +45,10 @@ public class PropertyController {
     }
 
 
-    @PostMapping
-    public ResponseEntity<Property> createOrUpdateProperty(@RequestBody Property property) {
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<Property> createOrUpdateProperty(
+            @RequestPart("property") Property property,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication.getPrincipal() instanceof UserDetailsImpl)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -61,9 +64,14 @@ public class PropertyController {
             property.setAvailabilitySlots(new ArrayList<>());
         }
 
+        // If file is included, you can handle it here
+        if (file != null && !file.isEmpty()) {
+            // Handle file storage logic (if needed)
+        }
         Property savedProperty = propertyService.saveProperty(property, ownerId);
         return new ResponseEntity<>(savedProperty, HttpStatus.CREATED);
     }
+
 
 
     @PostMapping("/{id}/availability-slots")

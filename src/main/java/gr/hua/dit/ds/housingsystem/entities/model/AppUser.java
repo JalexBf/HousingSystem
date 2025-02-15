@@ -1,5 +1,7 @@
 package gr.hua.dit.ds.housingsystem.entities.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import gr.hua.dit.ds.housingsystem.entities.enums.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -54,25 +56,15 @@ public class AppUser {
     @Column(nullable = false)
     private boolean approved = false;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
-    @JoinTable(
-            name="rental_user",
-            joinColumns = @JoinColumn(name="appUser_id"),
-            inverseJoinColumns = @JoinColumn(name="rental_id"),
-            uniqueConstraints = @UniqueConstraint(columnNames = {"appUser_id", "rental_id"})
-    )
-    private Set<RentalRequest> rental;
+    //@JsonManagedReference
+    @JsonIgnore
+    @OneToMany(mappedBy = "tenant", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    private Set<RentalRequest> rentalRequests;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
-    @JoinTable(
-            name="viewing_user",
-            joinColumns = @JoinColumn(name="appUser_id"),
-            inverseJoinColumns = @JoinColumn(name="viewing_id"),
-            uniqueConstraints = @UniqueConstraint(columnNames = {"appUser_id", "viewing_id"})
-    )
-    private Set<ViewingRequest> viewing;
+    //@JsonManagedReference
+    @JsonIgnore
+    @OneToMany(mappedBy = "tenant", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    private Set<ViewingRequest> viewingRequests;
 
     public AppUser() {
     }

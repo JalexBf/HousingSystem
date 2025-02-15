@@ -1,5 +1,7 @@
 package gr.hua.dit.ds.housingsystem.entities.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import gr.hua.dit.ds.housingsystem.entities.enums.PropertyCategory;
 import gr.hua.dit.ds.housingsystem.entities.enums.PropertyFeatures;
 import jakarta.persistence.*;
@@ -66,15 +68,19 @@ public class Property {
     private Set<PropertyFeatures> amenities;
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Photo> photos; // Changed to a related entity
+    private Set<Photo> photos;
 
+    //@JsonBackReference
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private AppUser owner;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ViewingRequest> viewingRequests;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AvailabilitySlot> availabilitySlots;
 
