@@ -1,0 +1,38 @@
+# Ignore Maven build artifacts
+target/
+*.jar
+
+# Allow Maven Wrapper JAR
+!.mvn/wrapper/maven-wrapper.jar
+
+# Ignore IDE-specific files
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Ignore STS-specific files
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# Ignore NetBeans-specific files
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Ignore VS Code-specific files
+.vscode/
+
+# Ignore Gradle build artifacts
+build/
+
+# Logs and temporary files
+*.log
+*.tmp

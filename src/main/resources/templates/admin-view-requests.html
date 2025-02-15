@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Property Requests</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Property Requests</h2>
+
+  <div class="mb-3">
+    <a href="/admin" class="btn btn-secondary">Back to Dashboard</a>
+  </div>
+
+  <!-- Button to Fetch Unapproved Properties -->
+  <div class="mb-3">
+    <button class="btn btn-primary" onclick="fetchUnapprovedProperties()">
+      Show Unapproved Properties
+    </button>
+  </div>
+
+  <!-- Table for Displaying Properties -->
+  <div class="table-responsive">
+    <table id="propertiesTable" class="table table-bordered">
+      <thead class="table-light">
+      <tr>
+        <th>ID</th>
+        <th>Address</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  async function fetchUnapprovedProperties() {
+    const response = await fetch('/admin/unapprovedProperties');
+    const properties = await response.json();
+    const tbody = document.getElementById('propertiesTable').querySelector('tbody');
+    tbody.innerHTML = '';
+
+    if (properties.length === 0) {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+                <td colspan="4" class="text-center text-muted">
+                    No unapproved properties found.
+                </td>
+            `;
+      tbody.appendChild(row);
+      return;
+    }
+
+    properties.forEach(prop => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+                <td>${prop.id}</td>
+                <td>${prop.address}</td>
+                <td>${prop.approved ? 'Approved' : 'Unapproved'}</td>
+                <td>
+                    <button class="btn btn-success btn-sm me-1" onclick="approveProperty(${prop.id})">Approve</button>
+                    <button class="btn btn-danger btn-sm" onclick="rejectProperty(${prop.id})">Reject</button>
+                </td>
+            `;
+      tbody.appendChild(row);
+    });
+  }
+
+  async function approveProperty(propertyId) {
+    const response = await fetch(`/admin/approveProperty/${propertyId}`, {
+      method: 'PUT'
+    });
+    alert(await response.text());
+    fetchUnapprovedProperties();
+  }
+
+  async function rejectProperty(propertyId) {
+    const response = await fetch(`/admin/rejectProperty/${propertyId}`, {
+      method: 'DELETE'
+    });
+    alert(await response.text());
+    fetchUnapprovedProperties();
+  }
+</script>
+</body>
+</html>
