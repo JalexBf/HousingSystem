@@ -17,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -138,7 +140,6 @@ public class PropertyService {
     }
 
 
-
     public List<Property> getPropertiesByCategory(PropertyCategory category) {
         return propertyRepository.findByCategory(category);
     }
@@ -169,7 +170,30 @@ public class PropertyService {
         propertyRepository.deleteById(propertyId);
     }
 
+
     public List<Property> getAllProperties() {
         return propertyRepository.findAll();
+    }
+
+
+    public List<Property> searchProperties(String category, Double minPrice, Double maxPrice, String location, Integer minRooms) {
+        return propertyRepository.searchProperties(category, minPrice, maxPrice, location, minRooms);
+    }
+
+    public List<Property> findAvailableProperties(String area, String date) {
+        LocalDateTime parsedDate = null;
+        if (date != null && !date.isEmpty()) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            parsedDate = LocalDateTime.parse(date + " 00:00", formatter);
+        }
+        return propertyRepository.findAvailableProperties(area, parsedDate);
+    }
+
+    public List<Property> getAvailableProperties() {
+        return propertyRepository.findAllAvailableProperties();
+    }
+
+    public Property findById(Long id) {
+        return propertyRepository.findById(id).orElse(null);
     }
 }

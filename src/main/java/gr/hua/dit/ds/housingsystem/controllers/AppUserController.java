@@ -53,7 +53,7 @@ public class AppUserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG) // Adjust based on your file type
+                .contentType(MediaType.IMAGE_JPEG)
                 .body(resource);
     }
 }

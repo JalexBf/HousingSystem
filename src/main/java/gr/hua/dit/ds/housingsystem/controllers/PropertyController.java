@@ -154,11 +154,13 @@ public class PropertyController {
         return new ResponseEntity<>(properties, HttpStatus.OK);
     }
 
+
     @PostMapping("/{id}/approve")
     public ResponseEntity<String> approveProperty(@PathVariable Long id) {
         propertyService.approveProperty(id);
         return new ResponseEntity<>("Property approved successfully.", HttpStatus.OK);
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProperty(@PathVariable Long id) {
@@ -209,4 +211,33 @@ public class PropertyController {
     }
 
 
+    @GetMapping("/search")
+    public ResponseEntity<List<Property>> searchProperties(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Integer minRooms) {
+
+        // Delegate the call to the service layer
+        List<Property> properties = propertyService.searchProperties(category, minPrice, maxPrice, location, minRooms);
+        return ResponseEntity.ok(properties);
+    }
+
+
+    @GetMapping("/searchByAreaAndDate")
+    public ResponseEntity<List<Property>> searchByAreaAndDate(
+            @RequestParam(required = false) String area,
+            @RequestParam(required = false) String date) {
+        List<Property> properties = propertyService.findAvailableProperties(area, date);
+        return ResponseEntity.ok(properties);
+    }
+
+
+    @GetMapping("/available")
+    public ResponseEntity<List<Property>> getAvailableProperties() {
+        System.out.println("\n\n\nThe request for Available Properties reached the controller\n\n\n");
+        List<Property> properties = propertyService.getAvailableProperties();
+        return ResponseEntity.ok(properties);
+    }
 }

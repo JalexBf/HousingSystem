@@ -57,7 +57,7 @@ public class AppUserService {
         String directory = "uploads/idProofs/";
         String filePath = directory + userId + "-" + type + "-" + file.getOriginalFilename();
         File dest = new File(filePath);
-        dest.getParentFile().mkdirs(); // Create directories if not exist
+        dest.getParentFile().mkdirs();
         file.transferTo(dest);
         return filePath;
     }
@@ -73,7 +73,6 @@ public class AppUserService {
         if (!afm.matches("\\d{10}")) {
             throw new IllegalArgumentException("AFM must be exactly 10 digits.");
         }
-        // Add checksum validation logic here if needed
     }
 
 

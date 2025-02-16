@@ -3,20 +3,31 @@ package gr.hua.dit.ds.housingsystem.controllers;
 import gr.hua.dit.ds.housingsystem.entities.model.AppUser;
 import gr.hua.dit.ds.housingsystem.entities.model.Property;
 import gr.hua.dit.ds.housingsystem.services.AdminService;
+import gr.hua.dit.ds.housingsystem.services.PropertyDTO;
+import gr.hua.dit.ds.housingsystem.services.PropertyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
-@RestController
+@Controller
 @RequestMapping("/admin")
 public class AdminController {
 
     private final AdminService adminService;
 
-    public AdminController(AdminService adminService) {
+    private final PropertyService propertyService;
+
+    public AdminController(AdminService adminService, PropertyService propertyService) {
         this.adminService = adminService;
+        this.propertyService = propertyService;
     }
+
+    private static final Logger log = LoggerFactory.getLogger(AdminController.class);
 
 
     @PutMapping("/approveProperty/{propertyId}")
@@ -82,17 +93,45 @@ public class AdminController {
     }
 
     @GetMapping("/checkUsername")
-    public boolean isUsernameUnique(
+    public ResponseEntity<Boolean> isUsernameUnique(
             @RequestParam String username,
             @RequestParam(required=false) Long excludeId
     ) {
-        return adminService.isUsernameUnique(username, excludeId);
+        boolean isUnique = adminService.isUsernameUnique(username, excludeId);
+        return ResponseEntity.ok(isUnique);
     }
 
-    @GetMapping("/userDetails/{userId}")
-    public ResponseEntity<AppUser> getUserDetails(@PathVariable Long userId) {
-        AppUser user = adminService.getUserById(userId);
-        return ResponseEntity.ok(user);
+    @GetMapping("/checkEmail")
+    public ResponseEntity<Boolean> isEmailUnique(
+            @RequestParam String email,
+            @RequestParam(required = false) Long excludeId) {
+
+        boolean isUnique = adminService.isEmailUnique(email, excludeId);
+        return ResponseEntity.ok(isUnique);
     }
+
+
+    @GetMapping("/userDetailsPage/{userId}")
+    public String userDetailsPage(@PathVariable Long userId, Model model) {
+        AppUser user = adminService.getUserById(userId);
+        model.addAttribute("user", user);
+        return "userDetails";
+    }
+
+    /*
+    @GetMapping("/propertyDetails/{id}")
+    public ResponseEntity<PropertyDTO> getPropertyDetails(@PathVariable Long id) {
+        Property property = propertyService.getPropertyById(id);
+
+        property.getPhotos().size();
+        property.getAmenities().size();
+        property.getViewingRequests().size();
+        property.getAvailabilitySlots().size();
+
+        return ResponseEntity.ok(new PropertyDTO(property));
+    }"*/
+
+
+
 
 }
