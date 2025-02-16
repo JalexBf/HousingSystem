@@ -93,7 +93,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/properties").permitAll()
+                        .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/", "/home", "/images/**", "/js/**", "/css/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)  // <-- Register filter here
@@ -105,8 +107,9 @@ public class SecurityConfig {
                         .successHandler(authenticationSuccessHandler())
                         .permitAll()
                 )
-                .logout((logout) -> logout.permitAll());
-
+                .logout((logout) -> logout.permitAll())
+                .exceptionHandling(ex -> ex .accessDeniedPage("/accessDenied")
+                );
 
         return http.build();
     }
