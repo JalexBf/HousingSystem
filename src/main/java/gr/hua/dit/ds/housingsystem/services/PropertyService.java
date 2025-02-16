@@ -15,12 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -153,7 +150,8 @@ public class PropertyService {
 
 
     public List<Property> getPropertiesByOwner(Long ownerId) {
-        return propertyRepository.findByOwnerId(ownerId);
+        List<Property> properties = propertyRepository.findByOwnerId(ownerId);
+        return properties != null ? properties : new ArrayList<>();
     }
 
 
@@ -169,5 +167,9 @@ public class PropertyService {
             throw new EntityNotFoundException("Property not found with ID: " + propertyId);
         }
         propertyRepository.deleteById(propertyId);
+    }
+
+    public List<Property> getAllProperties() {
+        return propertyRepository.findAll();
     }
 }

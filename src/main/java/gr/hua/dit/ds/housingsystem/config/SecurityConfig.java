@@ -79,7 +79,6 @@ public class SecurityConfig {
     */
 
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         final CorsConfiguration corsConfiguration = new CorsConfiguration();
@@ -93,6 +92,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(request -> corsConfiguration))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/properties").permitAll()
                         .requestMatchers("/", "/home", "/images/**", "/js/**", "/css/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -102,9 +102,11 @@ public class SecurityConfig {
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")
+                        .successHandler(authenticationSuccessHandler())
                         .permitAll()
                 )
                 .logout((logout) -> logout.permitAll());
+
 
         return http.build();
     }

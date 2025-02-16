@@ -32,4 +32,9 @@ public class Photo {
         // Use only id for hashCode
         return getClass().hashCode();
     }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
 }

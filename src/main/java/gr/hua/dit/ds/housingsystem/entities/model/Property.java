@@ -83,7 +83,7 @@ public class Property {
     @JsonIgnore
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ViewingRequest> viewingRequests;
-    
+
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AvailabilitySlot> availabilitySlots;
 
@@ -102,5 +102,37 @@ public class Property {
     public int hashCode() {
         // Use only id for hashCode
         return getClass().hashCode();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public PropertyCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(PropertyCategory category) {
+        this.category = category;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    public Set<Photo> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(Set<Photo> photos) {
+        this.photos = photos;
     }
 }

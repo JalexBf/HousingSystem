@@ -7,10 +7,14 @@ import gr.hua.dit.ds.housingsystem.entities.model.Property;
 import gr.hua.dit.ds.housingsystem.repositories.AppUserRepository;
 import gr.hua.dit.ds.housingsystem.repositories.AvailabilitySlotRepository;
 import gr.hua.dit.ds.housingsystem.repositories.PropertyRepository;
+import gr.hua.dit.ds.housingsystem.services.PropertyDTO;
 import gr.hua.dit.ds.housingsystem.services.PropertyService;
 import gr.hua.dit.ds.housingsystem.services.UserDetailsImpl;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +23,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/api/properties")
@@ -161,4 +169,44 @@ public class PropertyController {
             return new ResponseEntity<>("Property not found: " + e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
+
+
+    @GetMapping
+    public List<PropertyDTO> getProperties() {
+        return propertyService.getAllProperties().stream()
+                .map(property -> {
+                    String firstPhotoUrl = property.getPhotos().isEmpty() ? null
+                            : Paths.get(property.getPhotos().iterator().next().getFilePath()).getFileName().toString();
+                    return new PropertyDTO(property.getId(), property.getCategory().name(), property.getArea(), firstPhotoUrl);
+                })
+                .collect(Collectors.toList());
+    }
+
+
+    @GetMapping("/images/{filename}")
+    public ResponseEntity<Resource> getImage(@PathVariable String filename) {
+        try {
+            Path path = Paths.get(System.getProperty("user.home") + "/property_photos/" + filename);
+            Resource resource = new UrlResource(path.toUri());
+
+            if (!resource.exists() || !resource.isReadable()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // Detect MIME type dynamically
+            String mimeType = Files.probeContentType(path);
+            if (mimeType == null) {
+                mimeType = MediaType.APPLICATION_OCTET_STREAM_VALUE; // Default if unknown
+            }
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, mimeType)
+                    .body(resource);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
 }
