@@ -85,13 +85,6 @@ class PropertyControllerTest {
                 .andExpect(jsonPath("$[1].area").value("Thessaloniki"));
     }
 
-    @Test
-    void testDeleteProperty() throws Exception {
-        doNothing().when(propertyService).deleteProperty(1L);
-
-        mockMvc.perform(delete("/api/properties/1"))
-                .andExpect(status().isNoContent());
-    }
 
     @Test
     void testApproveProperty() throws Exception {

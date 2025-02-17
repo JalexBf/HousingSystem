@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -163,11 +164,13 @@ public class PropertyService {
     }
 
 
-    public void deleteProperty(Long propertyId) {
-        if (!propertyRepository.existsById(propertyId)) {
-            throw new EntityNotFoundException("Property not found with ID: " + propertyId);
+    public void deleteProperty(Long propertyId, Long userId) {
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found"));
+        if (!property.getOwner().getId().equals(userId)) {
+            throw new RuntimeException("Unauthorized: You can only delete your own properties");
         }
-        propertyRepository.deleteById(propertyId);
+        propertyRepository.delete(property);
     }
 
 
@@ -176,9 +179,22 @@ public class PropertyService {
     }
 
 
-    public List<Property> searchProperties(String category, Double minPrice, Double maxPrice, String location, Integer minRooms) {
-        return propertyRepository.searchProperties(category, minPrice, maxPrice, location, minRooms);
+    public List<Property> searchProperties(String area, String category, Integer minPrice, Integer maxPrice,
+                                           Integer minRooms, Integer maxRooms, Integer minSquareMeters, Integer maxSquareMeters) {
+        List<Property> properties = propertyRepository.findAll(); // Fetch all properties
+
+        return properties.stream()
+                .filter(property -> area == null || property.getArea().equalsIgnoreCase(area))
+                .filter(property -> category == null || property.getCategory().name().equalsIgnoreCase(category))
+                .filter(property -> minPrice == null || property.getPrice() >= minPrice)
+                .filter(property -> maxPrice == null || property.getPrice() <= maxPrice)
+                .filter(property -> minRooms == null || property.getNumberOfRooms() >= minRooms)
+                .filter(property -> maxRooms == null || property.getNumberOfRooms() <= maxRooms)
+                .filter(property -> minSquareMeters == null || property.getSquareMeters() >= minSquareMeters)
+                .filter(property -> maxSquareMeters == null || property.getSquareMeters() <= maxSquareMeters)
+                .collect(Collectors.toList());
     }
+
 
     public List<Property> findAvailableProperties(String area, String date) {
         LocalDateTime parsedDate = null;
@@ -196,4 +212,7 @@ public class PropertyService {
     public Property findById(Long id) {
         return propertyRepository.findById(id).orElse(null);
     }
+
+
+
 }

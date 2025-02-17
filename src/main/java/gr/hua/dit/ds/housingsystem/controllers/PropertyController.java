@@ -19,7 +19,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -115,7 +117,6 @@ public class PropertyController {
     }
 
 
-
     @GetMapping("/{id}")
     public ResponseEntity<PropertyDTO> getPropertyById(@PathVariable Long id) {
         Property property = propertyService.getPropertyById(id);
@@ -145,8 +146,6 @@ public class PropertyController {
 
         return ResponseEntity.ok(propertyDTO);
     }
-
-
 
 
     @PostMapping("/{id}/photos")
@@ -189,14 +188,14 @@ public class PropertyController {
     }
 
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProperty(@PathVariable Long id) {
-        try {
-            propertyService.deleteProperty(id);
-            return new ResponseEntity<>("Property deleted successfully.", HttpStatus.NO_CONTENT);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>("Property not found: " + e.getMessage(), HttpStatus.NOT_FOUND);
-        }
+    @DeleteMapping("/api/properties/{id}")
+    public ResponseEntity<?> deleteProperty(@PathVariable Long id, Authentication authentication) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Long userId = userDetails.getId(); // Get logged-in user's ID
+
+        propertyService.deleteProperty(id, userId);
+
+        return ResponseEntity.ok("Property deleted successfully");
     }
 
 
@@ -256,20 +255,6 @@ public class PropertyController {
     }
 
 
-    @GetMapping("/search")
-    public ResponseEntity<List<Property>> searchProperties(
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice,
-            @RequestParam(required = false) String location,
-            @RequestParam(required = false) Integer minRooms) {
-
-        // Delegate the call to the service layer
-        List<Property> properties = propertyService.searchProperties(category, minPrice, maxPrice, location, minRooms);
-        return ResponseEntity.ok(properties);
-    }
-
-
     @GetMapping("/searchByAreaAndDate")
     public ResponseEntity<List<Property>> searchByAreaAndDate(
             @RequestParam(required = false) String area,
@@ -284,5 +269,38 @@ public class PropertyController {
         System.out.println("\n\n\nThe request for Available Properties reached the controller\n\n\n");
         List<Property> properties = propertyService.getAvailableProperties();
         return ResponseEntity.ok(properties);
+    }
+
+
+    @GetMapping("/search")
+    public ResponseEntity<List<PropertyDTO>> searchProperties(
+            @RequestParam(required = false) String area,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Integer minPrice,
+            @RequestParam(required = false) Integer maxPrice,
+            @RequestParam(required = false) Integer minRooms,
+            @RequestParam(required = false) Integer maxRooms,
+            @RequestParam(required = false) Integer minSquareMeters,
+            @RequestParam(required = false) Integer maxSquareMeters) {
+
+        List<Property> properties = propertyService.searchProperties(area, category, minPrice, maxPrice, minRooms, maxRooms, minSquareMeters, maxSquareMeters);
+
+        List<PropertyDTO> propertyDTOs = properties.stream().map(property -> new PropertyDTO(
+                property.getId(),
+                property.getCategory().name(),
+                property.getArea(),
+                property.getAddress(),
+                property.getPrice(),
+                property.getSquareMeters(),
+                property.getFloor(),
+                property.getNumberOfRooms(),
+                property.getNumberOfBathrooms(),
+                property.getRenovationYear(),
+                property.getAtak(),
+                property.getAmenities().stream().map(Enum::name).collect(Collectors.toList()),
+                property.getPhotos().stream().map(photo -> "/images/" + Paths.get(photo.getFilePath()).getFileName().toString()).collect(Collectors.toList())
+        )).collect(Collectors.toList());
+
+        return ResponseEntity.ok(propertyDTOs);
     }
 }
