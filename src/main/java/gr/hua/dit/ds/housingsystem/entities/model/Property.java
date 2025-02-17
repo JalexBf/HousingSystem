@@ -71,6 +71,7 @@ public class Property {
     @Enumerated(EnumType.STRING)
     private Set<PropertyFeatures> amenities;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Photo> photos = new HashSet<>();
 
@@ -84,6 +85,7 @@ public class Property {
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ViewingRequest> viewingRequests;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AvailabilitySlot> availabilitySlots;
 

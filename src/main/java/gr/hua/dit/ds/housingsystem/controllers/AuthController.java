@@ -56,6 +56,17 @@ public class AuthController {
         log.info("Login attempt for username: {}", loginRequest.getUsername());
 
         try {
+            AppUser user = userRepository.findByUsername(loginRequest.getUsername())
+                    .orElseThrow(() -> new BadCredentialsException("Error: Invalid username or password!"));
+
+            // Check if the user is approved
+            if (!user.isApproved()) {
+                log.warn("Login attempt for unapproved user: {}", loginRequest.getUsername());
+                return ResponseEntity
+                        .status(HttpStatus.UNAUTHORIZED)
+                        .body(new MessageResponse("Error: Your account is pending approval by the admin."));
+            }
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(),
@@ -189,7 +200,7 @@ public class AuthController {
     }
 
 
-     //Helper method to save a base64-encoded image to a file.
+    //Helper method to save a base64-encoded image to a file.
 
     private String saveBase64Image(String base64Image, String fileName) throws IOException {
         if (base64Image == null || base64Image.isEmpty()) {

@@ -117,10 +117,37 @@ public class PropertyController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Property> getPropertyById(@PathVariable Long id) {
+    public ResponseEntity<PropertyDTO> getPropertyById(@PathVariable Long id) {
         Property property = propertyService.getPropertyById(id);
-        return new ResponseEntity<>(property, HttpStatus.OK);
+        if (property == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        PropertyDTO propertyDTO = new PropertyDTO(
+                property.getId(),
+                property.getCategory().name(),
+                property.getArea(),
+                property.getAddress(),
+                property.getPrice(),
+                property.getSquareMeters(),
+                property.getFloor(),
+                property.getNumberOfRooms(),
+                property.getNumberOfBathrooms(),
+                property.getRenovationYear(),
+                property.getAtak(),
+                property.getAmenities().stream()
+                        .map(Enum::name)
+                        .collect(Collectors.toList()),
+                property.getPhotos().stream()
+                        .map(photo -> "/images/" + Paths.get(photo.getFilePath()).getFileName().toString())
+                        .collect(Collectors.toList())
+        );
+
+        return ResponseEntity.ok(propertyDTO);
     }
+
+
+
 
     @PostMapping("/{id}/photos")
     public ResponseEntity<String> addPhotoToProperty(
@@ -174,14 +201,32 @@ public class PropertyController {
 
 
     @GetMapping
-    public List<PropertyDTO> getProperties() {
-        return propertyService.getAllProperties().stream()
-                .map(property -> {
-                    String firstPhotoUrl = property.getPhotos().isEmpty() ? null
-                            : Paths.get(property.getPhotos().iterator().next().getFilePath()).getFileName().toString();
-                    return new PropertyDTO(property.getId(), property.getCategory().name(), property.getArea(), firstPhotoUrl);
-                })
+    public ResponseEntity<List<PropertyDTO>> getProperties() {
+        List<Property> properties = propertyService.getAllProperties();
+
+        List<PropertyDTO> propertyDTOs = properties.stream()
+                .map(property -> new PropertyDTO(
+                        property.getId(),
+                        property.getCategory().name(),
+                        property.getArea(),
+                        property.getAddress(),
+                        property.getPrice(),
+                        property.getSquareMeters(),
+                        property.getFloor(),
+                        property.getNumberOfRooms(),
+                        property.getNumberOfBathrooms(),
+                        property.getRenovationYear(),
+                        property.getAtak(),
+                        property.getAmenities().stream()
+                                .map(Enum::name)
+                                .collect(Collectors.toList()),
+                        property.getPhotos().stream()
+                                .map(photo -> "/images/" + Paths.get(photo.getFilePath()).getFileName().toString())
+                                .collect(Collectors.toList())
+                ))
                 .collect(Collectors.toList());
+
+        return ResponseEntity.ok(propertyDTOs);
     }
 
 
