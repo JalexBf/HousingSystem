@@ -1,10 +1,12 @@
 package gr.hua.dit.ds.housingsystem.entities.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import gr.hua.dit.ds.housingsystem.entities.enums.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -54,25 +56,19 @@ public class AppUser {
     @Column(nullable = false)
     private boolean approved = false;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
-//    @JoinTable(
-//            name="rental_user",
-//            joinColumns = @JoinColumn(name="appUser_id"),
-//            inverseJoinColumns = @JoinColumn(name="rental_id"),
-//            uniqueConstraints = @UniqueConstraint(columnNames = {"appUser_id", "rental_id"})
-//    )
-    private Set<RentalRequest> rental;
+//    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+//            CascadeType.DETACH, CascadeType.REFRESH})
+    @OneToMany(mappedBy = "tenant", cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JsonManagedReference("user-rental")
+    private Set<RentalRequest> rental = new HashSet<>();
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
-//    @JoinTable(
-//            name="viewing_user",
-//            joinColumns = @JoinColumn(name="appUser_id"),
-//            inverseJoinColumns = @JoinColumn(name="viewing_id"),
-//            uniqueConstraints = @UniqueConstraint(columnNames = {"appUser_id", "viewing_id"})
-//    )
-    private Set<ViewingRequest> viewing;
+//    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+//            CascadeType.DETACH, CascadeType.REFRESH})
+    @OneToMany(mappedBy = "tenant", cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JsonManagedReference("user-viewing")
+    private Set<ViewingRequest> viewing = new HashSet<>();
 
     public AppUser() {
     }
@@ -176,6 +172,11 @@ public class AppUser {
 
     public void setRole(UserRole role) {
         this.role = role;
+    }
+
+    public void addRentalRequest(RentalRequest rentalRequest) {
+        rentalRequest.setTenant(this);
+        this.rental.add(rentalRequest);
     }
 
 }

@@ -1,9 +1,12 @@
 package gr.hua.dit.ds.housingsystem.entities.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.DayOfWeek;
+import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -14,8 +17,8 @@ public class AvailabilitySlot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY) // Lazy loading
+    @JsonBackReference("property-availability")
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
 

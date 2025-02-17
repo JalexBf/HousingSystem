@@ -3,12 +3,18 @@ package gr.hua.dit.ds.housingsystem.controllers;
 import gr.hua.dit.ds.housingsystem.entities.model.AppUser;
 import gr.hua.dit.ds.housingsystem.entities.model.Property;
 import gr.hua.dit.ds.housingsystem.services.AdminService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 
-@RestController
+@Controller
 @RequestMapping("/admin")
 public class AdminController {
 
@@ -17,6 +23,8 @@ public class AdminController {
     public AdminController(AdminService adminService) {
         this.adminService = adminService;
     }
+
+    private static final Logger log = LoggerFactory.getLogger(AdminController.class);
 
 
     @PutMapping("/approveProperty/{propertyId}")
@@ -89,10 +97,12 @@ public class AdminController {
         return adminService.isUsernameUnique(username, excludeId);
     }
 
-    @GetMapping("/userDetails/{userId}")
-    public ResponseEntity<AppUser> getUserDetails(@PathVariable Long userId) {
+    @GetMapping("/userDetailsPage/{userId}")
+    public String userDetailsPage(@PathVariable Long userId, Model model) {
         AppUser user = adminService.getUserById(userId);
-        return ResponseEntity.ok(user);
+        model.addAttribute("user", user);
+        return "userDetails";
     }
+
 
 }

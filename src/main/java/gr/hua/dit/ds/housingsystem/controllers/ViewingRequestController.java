@@ -37,11 +37,8 @@ public class ViewingRequestController {
 
     @PostMapping
     public ResponseEntity<ViewingRequest> createViewingRequest(@RequestBody ViewingRequest viewingRequest) {
-        System.out.println("\n\nRental viewing received: \n" + viewingRequest);
-        System.out.println("Available properties before: " + propertyRepository.findAllAvailableProperties().size());
+        System.out.println("\n\nViewing request received: " + viewingRequest);
         ViewingRequest createdRequest = viewingRequestService.createViewingRequest(viewingRequest);
-        System.out.println("Available properties after: " + propertyRepository.findAllAvailableProperties().size());
-
         return ResponseEntity.ok(createdRequest);
     }
 

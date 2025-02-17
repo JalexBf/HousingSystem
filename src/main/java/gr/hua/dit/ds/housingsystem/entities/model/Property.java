@@ -1,5 +1,9 @@
 package gr.hua.dit.ds.housingsystem.entities.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import gr.hua.dit.ds.housingsystem.entities.enums.PropertyCategory;
 import gr.hua.dit.ds.housingsystem.entities.enums.PropertyFeatures;
 import jakarta.persistence.*;
@@ -64,19 +68,35 @@ public class Property {
     @Enumerated(EnumType.STRING)
     private Set<PropertyFeatures> amenities;
 
-    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JsonManagedReference("property-photo")
     private Set<Photo> photos; // Changed to a related entity
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Ignore proxy-related fields
     private AppUser owner;
 
-    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference("property-rental")
+    private Set<RentalRequest> rentalRequests;
+
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference("property-viewing")
     private Set<ViewingRequest> viewingRequests;
 
-    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference("property-availability")
     private List<AvailabilitySlot> availabilitySlots;
 
     @Column(nullable = false)
     private boolean approved = false;
+
+
+    public void addViewingRequest(ViewingRequest viewingRequest) {
+        viewingRequest.setProperty(this);
+        this.viewingRequests.add(viewingRequest);
+    }
+
 }

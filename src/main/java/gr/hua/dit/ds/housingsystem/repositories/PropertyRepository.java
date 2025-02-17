@@ -40,8 +40,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             @Param("area") String area,
             @Param("date") LocalDateTime date);
 
-    @Query("SELECT DISTINCT p FROM Property p " +
-            "JOIN FETCH p.availabilitySlots a ")
+    @Query("SELECT DISTINCT p FROM Property p WHERE p.approved IS TRUE")
     List<Property> findAllAvailableProperties();
 
 }

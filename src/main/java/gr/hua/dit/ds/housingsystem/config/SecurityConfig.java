@@ -120,6 +120,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(request -> corsConfiguration))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Ensure stateless JWT authentication
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/", "/home", "/images/**", "/js/**", "/css/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -128,9 +129,9 @@ public class SecurityConfig {
                 .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class) // Register JWT Filter
 
                 .formLogin(form -> form
-                    .loginPage("/login")
-                    .successHandler(authenticationSuccessHandler())
-                    .permitAll()
+                        .loginPage("/login")
+                        .successHandler(authenticationSuccessHandler())
+                        .permitAll()
                 )
                 .logout(logout -> logout.permitAll())
                 .exceptionHandling(ex -> ex

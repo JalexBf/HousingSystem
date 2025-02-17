@@ -147,8 +147,6 @@ public class PropertyController {
             @RequestParam(required = false) Double maxPrice,
             @RequestParam(required = false) String location,
             @RequestParam(required = false) Integer minRooms) {
-
-        // Delegate the call to the service layer
         List<Property> properties = propertyService.searchProperties(category, minPrice, maxPrice, location, minRooms);
         return ResponseEntity.ok(properties);
     }
