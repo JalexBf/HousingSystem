@@ -17,11 +17,11 @@ public class PropertyDTO {
     private List<String> amenities;
     private List<String> photos;
 
-
+    private List<AvailabilitySlotDTO> availabilitySlots;
 
     public PropertyDTO(Long id, String category, String area, String address, Double price,
                        Integer squareMeters, Integer floor, Integer numberOfRooms, Integer numberOfBathrooms,
-                       Integer renovationYear, String atak, List<String> amenities, List<String> photos) {
+                       Integer renovationYear, String atak, List<String> amenities, List<String> photos, List<AvailabilitySlotDTO> availabilitySlots) {
         this.id = id;
         this.category = category;
         this.area = area;
@@ -35,6 +35,7 @@ public class PropertyDTO {
         this.atak = atak;
         this.amenities = amenities;
         this.photos = photos;
+        this.availabilitySlots = availabilitySlots;
     }
 
     public PropertyDTO() {
@@ -60,6 +61,10 @@ public class PropertyDTO {
     public String getAtak() { return atak; }
     public List<String> getAmenities() { return amenities; }
     public List<String> getPhotos() { return photos; }
+
+    public List<AvailabilitySlotDTO> getAvailabilitySlots() {
+        return availabilitySlots;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -111,5 +116,9 @@ public class PropertyDTO {
 
     public void setPhotos(List<String> photos) {
         this.photos = photos;
+    }
+
+    public void setAvailabilitySlots(List<AvailabilitySlotDTO> availabilitySlots) {
+        this.availabilitySlots = availabilitySlots;
     }
 }

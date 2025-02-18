@@ -19,7 +19,6 @@ public class AvailabilitySlot {
     @ManyToOne(fetch = FetchType.LAZY) // Lazy loading
     @JsonBackReference("property-availability")
     @JoinColumn(name = "property_id", nullable = false)
-    @JsonIgnore
     private Property property;
 
     @Enumerated(EnumType.STRING)

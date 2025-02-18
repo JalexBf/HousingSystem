@@ -226,6 +226,4 @@ public class PropertyService {
         return propertyRepository.findById(id).orElse(null);
     }
 
-
-
 }

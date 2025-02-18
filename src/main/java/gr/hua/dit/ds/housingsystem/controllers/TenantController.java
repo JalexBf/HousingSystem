@@ -8,10 +8,7 @@ import gr.hua.dit.ds.housingsystem.repositories.AppUserRepository;
 import gr.hua.dit.ds.housingsystem.services.*;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -100,5 +97,18 @@ public class TenantController {
         return dto;
     }
 
+    @PostMapping("/{tenantId}/add-rental-request")
+    public ResponseEntity<AppUser> addRentalRequest(@PathVariable Long tenantId, @RequestBody RentalRequest rentalRequest) {
+        System.out.println("\nThe add rental tenant request reached the controller\n");
+        AppUser updatedTenant = tenantService.addRentalRequest(tenantId, rentalRequest);
+        return ResponseEntity.ok(updatedTenant);
+    }
+
+    @PostMapping("/{tenantId}/add-viewing-request")
+    public ResponseEntity<AppUser> addViewingRequest(@PathVariable Long tenantId, @RequestBody ViewingRequest viewingRequest) {
+        System.out.println("\nThe add viewing tenant request reached the controller\n");
+        AppUser updatedTenant = tenantService.addViewingRequest(tenantId, viewingRequest);
+        return ResponseEntity.ok(updatedTenant);
+    }
 
 }

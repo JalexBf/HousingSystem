@@ -7,6 +7,7 @@ import gr.hua.dit.ds.housingsystem.entities.model.Property;
 import gr.hua.dit.ds.housingsystem.repositories.AppUserRepository;
 import gr.hua.dit.ds.housingsystem.repositories.AvailabilitySlotRepository;
 import gr.hua.dit.ds.housingsystem.repositories.PropertyRepository;
+import gr.hua.dit.ds.housingsystem.services.AvailabilitySlotDTO;
 import gr.hua.dit.ds.housingsystem.services.PropertyDTO;
 import gr.hua.dit.ds.housingsystem.services.PropertyService;
 import gr.hua.dit.ds.housingsystem.services.UserDetailsImpl;
@@ -141,6 +142,14 @@ public class PropertyController {
                         .collect(Collectors.toList()),
                 property.getPhotos().stream()
                         .map(photo -> "/images/" + Paths.get(photo.getFilePath()).getFileName().toString())
+                        .collect(Collectors.toList()),
+                property.getAvailabilitySlots().stream()
+                        .map(slot -> new AvailabilitySlotDTO(
+                                slot.getId(),
+                                slot.getDayOfWeek(),
+                                slot.getStartHour(),
+                                slot.getEndHour()
+                        ))
                         .collect(Collectors.toList())
         );
 
@@ -221,6 +230,14 @@ public class PropertyController {
                                 .collect(Collectors.toList()),
                         property.getPhotos().stream()
                                 .map(photo -> "/images/" + Paths.get(photo.getFilePath()).getFileName().toString())
+                                .collect(Collectors.toList()),
+                        property.getAvailabilitySlots().stream()
+                                .map(slot -> new AvailabilitySlotDTO(
+                                        slot.getId(),
+                                        slot.getDayOfWeek(),
+                                        slot.getStartHour(),
+                                        slot.getEndHour()
+                                ))
                                 .collect(Collectors.toList())
                 ))
                 .collect(Collectors.toList());
@@ -296,7 +313,15 @@ public class PropertyController {
                 property.getRenovationYear(),
                 property.getAtak(),
                 property.getAmenities().stream().map(Enum::name).collect(Collectors.toList()),
-                property.getPhotos().stream().map(photo -> "/images/" + Paths.get(photo.getFilePath()).getFileName().toString()).collect(Collectors.toList())
+                property.getPhotos().stream().map(photo -> "/images/" + Paths.get(photo.getFilePath()).getFileName().toString()).collect(Collectors.toList()),
+                property.getAvailabilitySlots().stream()
+                        .map(slot -> new AvailabilitySlotDTO(
+                                slot.getId(),
+                                slot.getDayOfWeek(),
+                                slot.getStartHour(),
+                                slot.getEndHour()
+                        ))
+                        .collect(Collectors.toList())
         )).collect(Collectors.toList());
 
         return ResponseEntity.ok(propertyDTOs);
