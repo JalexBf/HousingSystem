@@ -12,11 +12,15 @@ import gr.hua.dit.ds.housingsystem.repositories.PropertyRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -59,9 +63,9 @@ public class PropertyService {
     }
 
 
-    public Property getPropertyById(Long propertyId) {
-        return propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new EntityNotFoundException("Property not found with ID: " + propertyId));
+    public Property getPropertyById(Long id) {
+        return propertyRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Property not found"));
     }
 
 

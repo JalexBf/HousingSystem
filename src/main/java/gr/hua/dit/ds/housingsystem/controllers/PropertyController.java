@@ -7,9 +7,7 @@ import gr.hua.dit.ds.housingsystem.entities.model.Property;
 import gr.hua.dit.ds.housingsystem.repositories.AppUserRepository;
 import gr.hua.dit.ds.housingsystem.repositories.AvailabilitySlotRepository;
 import gr.hua.dit.ds.housingsystem.repositories.PropertyRepository;
-import gr.hua.dit.ds.housingsystem.services.PropertyDTO;
-import gr.hua.dit.ds.housingsystem.services.PropertyService;
-import gr.hua.dit.ds.housingsystem.services.UserDetailsImpl;
+import gr.hua.dit.ds.housingsystem.services.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -60,11 +58,17 @@ public class PropertyController {
             @RequestPart("property") Property property,
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
 
+        // Validate ATAK before checking authentication
+        if (property.getAtak() == null || property.getAtak().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ATAK number is required.");
+        }
+        if (propertyRepository.existsByAtak(property.getAtak())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ATAK number is already in use.");
+        }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication.getPrincipal() instanceof UserDetailsImpl)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
-
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         Long ownerId = userDetails.getId();
 
@@ -75,7 +79,6 @@ public class PropertyController {
         if (property.getAvailabilitySlots() == null) {
             property.setAvailabilitySlots(new ArrayList<>());
         }
-
         Property savedProperty = propertyService.saveProperty(property, ownerId);
 
         if (property.getAvailabilitySlots() != null && !property.getAvailabilitySlots().isEmpty()) {
@@ -123,6 +126,15 @@ public class PropertyController {
         if (property == null) {
             return ResponseEntity.notFound().build();
         }
+        List<AvailabilitySlotDTO> availabilitySlots = property.getAvailabilitySlots() != null
+                ? property.getAvailabilitySlots().stream()
+                .map(slot -> new AvailabilitySlotDTO(
+                        slot.getId(),
+                        slot.getDayOfWeek().name(),
+                        slot.getStartHour(),
+                        slot.getEndHour()))
+                .collect(Collectors.toList())
+                : new ArrayList<>();
 
         PropertyDTO propertyDTO = new PropertyDTO(
                 property.getId(),
@@ -136,14 +148,16 @@ public class PropertyController {
                 property.getNumberOfBathrooms(),
                 property.getRenovationYear(),
                 property.getAtak(),
-                property.getAmenities().stream()
-                        .map(Enum::name)
-                        .collect(Collectors.toList()),
-                property.getPhotos().stream()
+                property.getAmenities() != null
+                        ? property.getAmenities().stream().map(Enum::name).collect(Collectors.toList())
+                        : new ArrayList<>(),
+                property.getPhotos() != null
+                        ? property.getPhotos().stream()
                         .map(photo -> "/images/" + Paths.get(photo.getFilePath()).getFileName().toString())
                         .collect(Collectors.toList())
+                        : new ArrayList<>(),
+                availabilitySlots
         );
-
         return ResponseEntity.ok(propertyDTO);
     }
 
@@ -221,6 +235,13 @@ public class PropertyController {
                                 .collect(Collectors.toList()),
                         property.getPhotos().stream()
                                 .map(photo -> "/images/" + Paths.get(photo.getFilePath()).getFileName().toString())
+                                .collect(Collectors.toList()),
+                        property.getAvailabilitySlots().stream()
+                                .map(slot -> new AvailabilitySlotDTO(
+                                        slot.getId(),
+                                        slot.getDayOfWeek().name(),
+                                        slot.getStartHour(),
+                                        slot.getEndHour()))
                                 .collect(Collectors.toList())
                 ))
                 .collect(Collectors.toList());
@@ -298,7 +319,16 @@ public class PropertyController {
                 property.getRenovationYear(),
                 property.getAtak(),
                 property.getAmenities().stream().map(Enum::name).collect(Collectors.toList()),
-                property.getPhotos().stream().map(photo -> "/images/" + Paths.get(photo.getFilePath()).getFileName().toString()).collect(Collectors.toList())
+                property.getPhotos().stream()
+                        .map(photo -> "/images/" + Paths.get(photo.getFilePath()).getFileName().toString())
+                        .collect(Collectors.toList()),
+                property.getAvailabilitySlots().stream()
+                        .map(slot -> new AvailabilitySlotDTO(
+                                slot.getId(),
+                                slot.getDayOfWeek().name(),
+                                slot.getStartHour(),
+                                slot.getEndHour()))
+                        .collect(Collectors.toList())  // Add this collect() call
         )).collect(Collectors.toList());
 
         return ResponseEntity.ok(propertyDTOs);

@@ -20,8 +20,11 @@ public class ViewingRequest {
     @JoinColumn(name = "tenant_id", nullable = false)
     private AppUser tenant;
 
-    private LocalDateTime proposedTime;
-
     @Enumerated(EnumType.STRING)
     private RequestStatus status = RequestStatus.PENDING; // Status: PENDING, APPROVED, REJECTED, CANCELED
+
+    @ManyToOne
+    @JoinColumn(name = "availability_slot_id", nullable = false)
+    private AvailabilitySlot availabilitySlot;
+
 }

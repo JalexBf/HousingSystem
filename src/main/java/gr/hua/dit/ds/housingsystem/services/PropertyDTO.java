@@ -2,6 +2,7 @@ package gr.hua.dit.ds.housingsystem.services;
 
 import java.util.List;
 
+
 public class PropertyDTO {
     private Long id;
     private String category;
@@ -16,10 +17,12 @@ public class PropertyDTO {
     private String atak;
     private List<String> amenities;
     private List<String> photos;
+    private List<AvailabilitySlotDTO> availabilitySlots; // <-- Add this field
 
     public PropertyDTO(Long id, String category, String area, String address, Double price,
                        Integer squareMeters, Integer floor, Integer numberOfRooms, Integer numberOfBathrooms,
-                       Integer renovationYear, String atak, List<String> amenities, List<String> photos) {
+                       Integer renovationYear, String atak, List<String> amenities, List<String> photos,
+                       List<AvailabilitySlotDTO> availabilitySlots) { // <-- Add parameter
         this.id = id;
         this.category = category;
         this.area = area;
@@ -33,9 +36,10 @@ public class PropertyDTO {
         this.atak = atak;
         this.amenities = amenities;
         this.photos = photos;
+        this.availabilitySlots = availabilitySlots; // <-- Assign it
     }
 
-    // Getters
+
     public Long getId() { return id; }
     public String getCategory() { return category; }
     public String getArea() { return area; }
@@ -49,4 +53,5 @@ public class PropertyDTO {
     public String getAtak() { return atak; }
     public List<String> getAmenities() { return amenities; }
     public List<String> getPhotos() { return photos; }
+    public List<AvailabilitySlotDTO> getAvailabilitySlots() { return availabilitySlots; }
 }

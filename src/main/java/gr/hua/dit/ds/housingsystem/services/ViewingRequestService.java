@@ -26,11 +26,13 @@ public class ViewingRequestService {
         return viewingRequestRepository.findById(id);
     }
 
+
     @Transactional
     public ViewingRequest createViewingRequest(ViewingRequest viewingRequest) {
         viewingRequest.setStatus(RequestStatus.PENDING);
         return viewingRequestRepository.save(viewingRequest);
     }
+
 
     @Transactional
     public ViewingRequest updateViewingRequest(Long id, RequestStatus status) {
@@ -40,8 +42,23 @@ public class ViewingRequestService {
         return viewingRequestRepository.save(viewingRequest);
     }
 
+
     @Transactional
     public void deleteViewingRequest(Long id) {
         viewingRequestRepository.deleteById(id);
+    }
+
+
+    @Transactional
+    public ViewingRequest manageViewingRequest(Long requestId, RequestStatus status, Long ownerId) {
+        ViewingRequest viewingRequest = viewingRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Viewing Request not found"));
+
+        if (!viewingRequest.getProperty().getOwner().getId().equals(ownerId)) {
+            throw new RuntimeException("Unauthorized: You are not the owner of this property");
+        }
+
+        viewingRequest.setStatus(status);
+        return viewingRequestRepository.save(viewingRequest);
     }
 }

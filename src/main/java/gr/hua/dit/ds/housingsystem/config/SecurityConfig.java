@@ -93,7 +93,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(request -> corsConfiguration))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/properties/**").permitAll() // Viewing open to everyone
+                        .requestMatchers(HttpMethod.GET, "/api/properties/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/properties/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/tenants/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/tenants/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/properties/**").hasAuthority("OWNER") // Only owners can delete
 
                         .requestMatchers("/images/**").permitAll()
