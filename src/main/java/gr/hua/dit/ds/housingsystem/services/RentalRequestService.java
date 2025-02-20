@@ -17,21 +17,31 @@ public class RentalRequestService {
     @Autowired
     private RentalRequestRepository rentalRequestRepository;
 
+
     @Transactional
     public List<RentalRequest> getAllRentalRequests() {
-        return rentalRequestRepository.findAll();
+        List<RentalRequest> rentalRequests = rentalRequestRepository.findAll();
+
+        for (RentalRequest rr : rentalRequests) {
+            if (rr.getTenant() != null) rr.getTenant().getUsername();
+            if (rr.getProperty() != null) rr.getProperty().getAddress();
+        }
+        return rentalRequests;
     }
+
 
     @Transactional
     public Optional<RentalRequest> getRentalRequestById(Long id) {
         return rentalRequestRepository.findById(id);
     }
 
+
     @Transactional
     public RentalRequest createRentalRequest(RentalRequest rentalRequest) {
         rentalRequest.setStatus(RequestStatus.PENDING);
         return rentalRequestRepository.save(rentalRequest);
     }
+
 
     @Transactional
     public RentalRequest updateRentalRequest(Long id, RequestStatus status) {
@@ -40,6 +50,7 @@ public class RentalRequestService {
         rentalRequest.setStatus(status);
         return rentalRequestRepository.save(rentalRequest);
     }
+
 
     @Transactional
     public void deleteRentalRequest(Long id) {

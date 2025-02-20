@@ -1,6 +1,6 @@
 package gr.hua.dit.ds.housingsystem.controllers;
 
-import gr.hua.dit.ds.housingsystem.entities.enums.UserRole;
+import gr.hua.dit.ds.housingsystem.DTO.*;
 import gr.hua.dit.ds.housingsystem.entities.model.AppUser;
 import gr.hua.dit.ds.housingsystem.entities.model.RentalRequest;
 import gr.hua.dit.ds.housingsystem.entities.model.ViewingRequest;
@@ -9,11 +9,10 @@ import gr.hua.dit.ds.housingsystem.services.*;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
+
 
 @RestController
 @RequestMapping("/api/tenants")
@@ -66,7 +65,8 @@ public class TenantController {
                                 rentalRequest.getProperty().getId(),
                                 rentalRequest.getProperty().getAddress(),
                                 rentalRequest.getProperty().getPrice()
-                        )
+                        ),
+                        null  
                 ));
             }
         }
@@ -81,6 +81,7 @@ public class TenantController {
                                 viewingRequest.getProperty().getAddress(),
                                 viewingRequest.getProperty().getPrice()
                         ),
+                        null,  // Tenant is not included when returned in TenantController
                         new AvailabilitySlotDTO(
                                 viewingRequest.getAvailabilitySlot().getId(),
                                 viewingRequest.getAvailabilitySlot().getDayOfWeek(),

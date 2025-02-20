@@ -1,5 +1,6 @@
 package gr.hua.dit.ds.housingsystem.services;
 
+import gr.hua.dit.ds.housingsystem.DTO.PropertyDTO;
 import gr.hua.dit.ds.housingsystem.entities.enums.PropertyCategory;
 import gr.hua.dit.ds.housingsystem.entities.model.AppUser;
 import gr.hua.dit.ds.housingsystem.entities.model.AvailabilitySlot;

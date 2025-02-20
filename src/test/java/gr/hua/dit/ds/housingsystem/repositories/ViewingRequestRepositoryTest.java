@@ -78,7 +78,6 @@ public class ViewingRequestRepositoryTest {
         ViewingRequest viewingRequest = new ViewingRequest();
         viewingRequest.setProperty(property);
         viewingRequest.setTenant(savedTenant); // Set tenant
-        viewingRequest.setProposedTime(LocalDateTime.now().plusDays(3));
         viewingRequest.setStatus(RequestStatus.PENDING);
 
         viewingRequestRepository.save(viewingRequest);

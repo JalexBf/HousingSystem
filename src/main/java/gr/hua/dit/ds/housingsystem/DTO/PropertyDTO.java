@@ -1,4 +1,4 @@
-package gr.hua.dit.ds.housingsystem.services;
+package gr.hua.dit.ds.housingsystem.DTO;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class PropertyDTO {
         this.price = price;
     }
 
-    // Getters
+
     public Long getId() { return id; }
     public String getCategory() { return category; }
     public String getArea() { return area; }

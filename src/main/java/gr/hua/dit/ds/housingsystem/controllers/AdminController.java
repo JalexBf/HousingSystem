@@ -3,7 +3,6 @@ package gr.hua.dit.ds.housingsystem.controllers;
 import gr.hua.dit.ds.housingsystem.entities.model.AppUser;
 import gr.hua.dit.ds.housingsystem.entities.model.Property;
 import gr.hua.dit.ds.housingsystem.services.AdminService;
-import gr.hua.dit.ds.housingsystem.services.PropertyDTO;
 import gr.hua.dit.ds.housingsystem.services.PropertyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

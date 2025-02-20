@@ -1,9 +1,10 @@
 # Property Rental Management System - Backend
 
 ## Overview
-This is the **backend service** for a Property Rental Management System, built with **Spring Boot** and **Spring Security**. It provides APIs for **authentication, user roles, property listings, rental/viewing requests**, and **admin management**.
+This is the **backend service** for a Property Rental Management System, built with **Spring Boot** and **Spring Security**. It provides APIs for **authentication, user roles, property listings, rental/viewing requests**, and **admin management**. 
 
 ---
+**Password for Admin user is currently:** 'password123'
 
 ## Features
 

@@ -1,6 +1,12 @@
 package gr.hua.dit.ds.housingsystem.controllers;
 
+import gr.hua.dit.ds.housingsystem.DTO.PropertyDTO;
+import gr.hua.dit.ds.housingsystem.DTO.RentalRequestDTO;
+import gr.hua.dit.ds.housingsystem.DTO.TenantDTO;
 import gr.hua.dit.ds.housingsystem.entities.enums.RequestStatus;
+import gr.hua.dit.ds.housingsystem.entities.model.AppUser;
+import gr.hua.dit.ds.housingsystem.entities.model.Photo;
+import gr.hua.dit.ds.housingsystem.entities.model.Property;
 import gr.hua.dit.ds.housingsystem.entities.model.RentalRequest;
 import gr.hua.dit.ds.housingsystem.services.RentalRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/rental-requests")
@@ -18,11 +25,33 @@ public class RentalRequestController {
     @Autowired
     private RentalRequestService rentalRequestService;
 
+
+    // Updated for owner manage requests
     @GetMapping
-    public ResponseEntity<List<RentalRequest>> getAllRentalRequests() {
+    public ResponseEntity<List<RentalRequestDTO>> getAllRentalRequests() {
         List<RentalRequest> rentalRequests = rentalRequestService.getAllRentalRequests();
-        return ResponseEntity.ok(rentalRequests);
+
+        List<RentalRequestDTO> dtos = rentalRequests.stream()
+                .map(rr -> {
+                    Property property = rr.getProperty();
+                    AppUser tenant = rr.getTenant();
+
+                    return new RentalRequestDTO(
+                            rr.getId(),
+                            rr.getStatus().name(),
+                            property != null ? new PropertyDTO(
+                                    property.getId(),
+                                    property.getAddress(),
+                                    property.getPrice()
+                            ) : null,
+                            tenant != null ? new TenantDTO(tenant.getId(), tenant.getUsername()) : null
+                    );
+                })
+                .toList();
+
+        return ResponseEntity.ok(dtos);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<RentalRequest> getRentalRequestById(@PathVariable Long id) {
