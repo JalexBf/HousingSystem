@@ -4,7 +4,13 @@
 This is the **backend service** for a Property Rental Management System, built with **Spring Boot** and **Spring Security**. It provides APIs for **authentication, user roles, property listings, rental/viewing requests**, and **admin management**. 
 
 ---
-**Password for Admin user is currently:** 'password123'
+## Log-in
+- **Admin Panel**: Admin users log in through the **backend** at `http://localhost:8080`.
+- **User Interface**: Owners and tenants log in through the **frontend** at `http://localhost:5173`.
+
+Password for Admin user is currently: **'password123'** and database credentials can be found in the **application.properties** file.
+
+---
 
 ## Features
 

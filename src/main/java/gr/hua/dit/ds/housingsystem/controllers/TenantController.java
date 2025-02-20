@@ -66,7 +66,7 @@ public class TenantController {
                                 rentalRequest.getProperty().getAddress(),
                                 rentalRequest.getProperty().getPrice()
                         ),
-                        null  
+                        null
                 ));
             }
         }
