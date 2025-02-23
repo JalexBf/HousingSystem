@@ -9,7 +9,7 @@ import gr.hua.dit.ds.housingsystem.repositories.AppUserRepository;
 import gr.hua.dit.ds.housingsystem.repositories.AvailabilitySlotRepository;
 import gr.hua.dit.ds.housingsystem.services.PropertyService;
 import gr.hua.dit.ds.housingsystem.services.TenantServiceImpl;
-import gr.hua.dit.ds.housingsystem.services.ViewingRequestDTO;
+import gr.hua.dit.ds.housingsystem.DTO.ViewingRequestDTO;
 import gr.hua.dit.ds.housingsystem.services.ViewingRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -11,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // Prevent Spring from treating "/images/**" as static resources
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("file:/home/alexj/property_photos/");
+                .addResourceLocations("file:uploads/property-photos/");
     }
 }
 

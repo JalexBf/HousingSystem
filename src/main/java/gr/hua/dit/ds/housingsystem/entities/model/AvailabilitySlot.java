@@ -31,5 +31,8 @@ public class AvailabilitySlot {
         if (startHour < 6 || startHour >= 22 || endHour <= startHour || endHour > 22) {
             throw new IllegalArgumentException("Invalid time slot. Hours must be between 06:00 and 22:00.");
         }
+        if (dayOfWeek == null) {
+            throw new IllegalArgumentException("Day of week cannot be null");
+        }
     }
 }

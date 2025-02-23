@@ -1,5 +1,7 @@
 package gr.hua.dit.ds.housingsystem.controllers;
 
+import gr.hua.dit.ds.housingsystem.DTO.AvailabilitySlotDTO;
+import gr.hua.dit.ds.housingsystem.DTO.PropertyDTO;
 import gr.hua.dit.ds.housingsystem.entities.enums.PropertyCategory;
 import gr.hua.dit.ds.housingsystem.entities.model.AppUser;
 import gr.hua.dit.ds.housingsystem.entities.model.AvailabilitySlot;
@@ -8,7 +10,6 @@ import gr.hua.dit.ds.housingsystem.repositories.AppUserRepository;
 import gr.hua.dit.ds.housingsystem.repositories.AvailabilitySlotRepository;
 import gr.hua.dit.ds.housingsystem.repositories.PropertyRepository;
 import gr.hua.dit.ds.housingsystem.services.*;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -17,9 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -36,6 +35,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/properties")
 public class PropertyController {
 
+    @Autowired
     private final PropertyService propertyService;
 
     @Autowired
@@ -58,13 +58,14 @@ public class PropertyController {
             @RequestPart("property") Property property,
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
 
-        // Validate ATAK before checking authentication
+        // Validate ATAK
         if (property.getAtak() == null || property.getAtak().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ATAK number is required.");
         }
         if (propertyRepository.existsByAtak(property.getAtak())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ATAK number is already in use.");
         }
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication.getPrincipal() instanceof UserDetailsImpl)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -76,47 +77,29 @@ public class PropertyController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         property.setOwner(owner);
 
-        if (property.getAvailabilitySlots() == null) {
-            property.setAvailabilitySlots(new ArrayList<>());
-        }
         Property savedProperty = propertyService.saveProperty(property, ownerId);
 
-        if (property.getAvailabilitySlots() != null && !property.getAvailabilitySlots().isEmpty()) {
-            propertyService.addAvailabilitySlots(savedProperty.getId(), property.getAvailabilitySlots());
-        }
-
-        System.out.println("Files received: " + (files != null ? files.size() : "null"));
+        // Handle photos
         if (files != null && !files.isEmpty()) {
             for (MultipartFile file : files) {
-                System.out.println("Uploading file: " + file.getOriginalFilename());
                 try {
                     propertyService.addPhotoToProperty(savedProperty.getId(), file, "property_photos", "property");
                 } catch (IOException e) {
-                    System.out.println("Error saving photo: " + e.getMessage());
-                    e.printStackTrace();
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                             .body("Failed to save photos: " + e.getMessage());
                 }
             }
         }
+
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProperty);
     }
 
 
-    @PostMapping("/{id}/availability-slots")
-    public void addAvailabilitySlots(@PathVariable Long propertyId, @RequestBody List<AvailabilitySlot> slots) {
-        if (slots == null || slots.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one availability slot is required.");
-        }
 
-        Property property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found."));
-
-        for (AvailabilitySlot slot : slots) {
-            slot.setProperty(property);
-            slot.validate();
-        }
-        availabilitySlotRepository.saveAll(slots);
+    @GetMapping("/check-atak")
+    public ResponseEntity<Boolean> checkAtak(@RequestParam String atak) {
+        boolean exists = propertyRepository.existsByAtak(atak);
+        return ResponseEntity.ok(exists);
     }
 
 
@@ -250,27 +233,20 @@ public class PropertyController {
     }
 
 
-    @GetMapping("/images/{filename}")
+    @GetMapping("/images/{filename:.+}")
     public ResponseEntity<Resource> getImage(@PathVariable String filename) {
         try {
-            Path path = Paths.get(System.getProperty("user.home") + "/property_photos/" + filename);
+            Path path = Paths.get("src/uploads-properties").resolve(filename);
             Resource resource = new UrlResource(path.toUri());
 
-            if (!resource.exists() || !resource.isReadable()) {
+            if (resource.exists() && resource.isReadable()) {
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(path))
+                        .body(resource);
+            } else {
                 return ResponseEntity.notFound().build();
             }
-
-            // Detect MIME type dynamically
-            String mimeType = Files.probeContentType(path);
-            if (mimeType == null) {
-                mimeType = MediaType.APPLICATION_OCTET_STREAM_VALUE; // Default if unknown
-            }
-
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_TYPE, mimeType)
-                    .body(resource);
-
-        } catch (Exception e) {
+        } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

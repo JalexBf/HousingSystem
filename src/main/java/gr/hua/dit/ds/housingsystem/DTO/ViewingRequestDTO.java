@@ -1,4 +1,4 @@
-package gr.hua.dit.ds.housingsystem.services;
+package gr.hua.dit.ds.housingsystem.DTO;
 
 
 public class ViewingRequestDTO {

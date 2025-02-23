@@ -1,7 +1,5 @@
 package gr.hua.dit.ds.housingsystem.controllers;
 
-import gr.hua.dit.ds.housingsystem.entities.enums.RequestStatus;
-import gr.hua.dit.ds.housingsystem.entities.model.AppUser;
 import gr.hua.dit.ds.housingsystem.entities.model.ViewingRequest;
 import gr.hua.dit.ds.housingsystem.repositories.AppUserRepository;
 import gr.hua.dit.ds.housingsystem.repositories.ViewingRequestRepository;
@@ -11,11 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/api/viewing-requests")
@@ -36,11 +33,13 @@ public class ViewingRequestController {
         return ResponseEntity.ok(viewingRequests);
     }
 
+
     @GetMapping("/{id}")
     public ResponseEntity<ViewingRequest> getViewingRequestById(@PathVariable Long id) {
         Optional<ViewingRequest> viewingRequest = viewingRequestService.getViewingRequestById(id);
         return viewingRequest.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
+
 
     @PostMapping
     public ResponseEntity<ViewingRequest> createViewingRequest(@RequestBody ViewingRequest viewingRequest) {
@@ -48,11 +47,11 @@ public class ViewingRequestController {
         return ResponseEntity.ok(createdRequest);
     }
 
-    // ✅ Updated to follow PropertyController authentication logic
+
     @PutMapping("/{id}/manage")
     public ResponseEntity<?> manageViewingRequest(
             @PathVariable Long id,
-            @RequestBody ViewingRequest requestBody,  // 🔹 Accept JSON request body
+            @RequestBody ViewingRequest requestBody,
             Authentication authentication) {
 
         if (!(authentication.getPrincipal() instanceof UserDetailsImpl)) {
@@ -69,7 +68,7 @@ public class ViewingRequestController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized: You are not the owner of this property");
         }
 
-        viewingRequest.setStatus(requestBody.getStatus()); // ✅ Read status from JSON body
+        viewingRequest.setStatus(requestBody.getStatus());
         viewingRequestRepository.save(viewingRequest);
 
         return ResponseEntity.ok(viewingRequest);

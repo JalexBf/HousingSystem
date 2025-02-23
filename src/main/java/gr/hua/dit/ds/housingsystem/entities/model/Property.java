@@ -1,18 +1,18 @@
 package gr.hua.dit.ds.housingsystem.entities.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import gr.hua.dit.ds.housingsystem.entities.enums.PropertyCategory;
 import gr.hua.dit.ds.housingsystem.entities.enums.PropertyFeatures;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 
 @Entity
 @Getter
@@ -36,7 +36,7 @@ public class Property {
 
     @Column(nullable = false, unique = true, length = 10)
     @Pattern(regexp = "^[0-9]{10}$", message = "ATAK must be exactly 10 digits.")
-    private String atak; // Formerly "registrationNumber"
+    private String atak;
 
     @Column(nullable = false)
     @Positive(message = "Price must be a positive number.")
@@ -64,7 +64,7 @@ public class Property {
     @Column(nullable = false)
     @Min(value = 1900, message = "Renovation year must be later than 1900.")
     @Max(value = 2100, message = "Renovation year must be earlier than 2100.")
-    private Integer renovationYear; // Formerly "renovationDate"
+    private Integer renovationYear;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "property_amenities", joinColumns = @JoinColumn(name = "property_id"))
@@ -82,12 +82,11 @@ public class Property {
     private AppUser owner;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true , fetch = FetchType.LAZY)
     private Set<ViewingRequest> viewingRequests;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AvailabilitySlot> availabilitySlots;
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<AvailabilitySlot> availabilitySlots = new HashSet<>();
 
     @Column(nullable = false)
     private boolean approved = false;
