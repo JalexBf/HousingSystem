@@ -1,85 +1,115 @@
 package gr.hua.dit.ds.housingsystem.controllers;
 
-import gr.hua.dit.ds.housingsystem.entities.enums.RequestStatus;
+import gr.hua.dit.ds.housingsystem.DTO.*;
 import gr.hua.dit.ds.housingsystem.entities.model.AppUser;
-import gr.hua.dit.ds.housingsystem.entities.model.AvailabilitySlot;
-import gr.hua.dit.ds.housingsystem.entities.model.Property;
+import gr.hua.dit.ds.housingsystem.entities.model.RentalRequest;
 import gr.hua.dit.ds.housingsystem.entities.model.ViewingRequest;
 import gr.hua.dit.ds.housingsystem.repositories.AppUserRepository;
-import gr.hua.dit.ds.housingsystem.repositories.AvailabilitySlotRepository;
-import gr.hua.dit.ds.housingsystem.services.PropertyService;
-import gr.hua.dit.ds.housingsystem.services.TenantServiceImpl;
-import gr.hua.dit.ds.housingsystem.DTO.ViewingRequestDTO;
-import gr.hua.dit.ds.housingsystem.services.ViewingRequestService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import gr.hua.dit.ds.housingsystem.services.*;
+import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 
 @RestController
 @RequestMapping("/api/tenants")
 public class TenantController {
+    TenantServiceImpl tenantService;
 
-    @Autowired
-    private ViewingRequestService viewingRequestService;
-    private final TenantServiceImpl tenantService;
-    private final AppUserRepository appUserRepository;
-    private final PropertyService propertyService;
+    AppUserRepository appUserRepository;
 
-    public TenantController(TenantServiceImpl tenantService, AppUserRepository appUserRepository, PropertyService propertyService) {
+    public TenantController(TenantServiceImpl tenantService) {
         this.tenantService = tenantService;
-        this.appUserRepository = appUserRepository;
-        this.propertyService = propertyService;
     }
 
     @GetMapping("")
-    public List<AppUser> findAllTenants() {
+    public List<AppUser> findAllTenants(){
         return tenantService.findAllTenants();
     }
 
+    @Transactional
     @GetMapping("/{tenantId}")
-    public ResponseEntity<AppUser> getTenant(@PathVariable Long tenantId) {
-        Optional<AppUser> appUser = tenantService.getTenant(tenantId);
+    public ResponseEntity<AppUserDTO> getTenant(@PathVariable Long tenantId) {
         System.out.println("\n\n\nThe request reached the controller\n\n\n");
-        return appUser.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        AppUser tenant = tenantService.getTenantWithRequests(tenantId);
+        if (tenant == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        AppUserDTO tenantDTO = mapToDTO(tenant);
+        return ResponseEntity.ok(tenantDTO);
     }
 
+    private AppUserDTO mapToDTO(AppUser tenant) {
+        AppUserDTO dto = new AppUserDTO();
+        dto.setId(tenant.getId());
+        dto.setUsername(tenant.getUsername());
+        dto.setFirstName(tenant.getFirstName());
+        dto.setLastName(tenant.getLastName());
+        dto.setEmail(tenant.getEmail());
+        dto.setPhone(tenant.getPhone());
 
-    @Autowired
-    private AvailabilitySlotRepository availabilitySlotRepository;
+        // Initialize collections and create defensive copies
+        Set<RentalRequestDTO> rentalRequests = new HashSet<>();
+        Set<ViewingRequestDTO> viewingRequests = new HashSet<>();
+
+        if (tenant.getRentalRequests() != null) {
+            for (RentalRequest rentalRequest : new HashSet<>(tenant.getRentalRequests())) {
+                rentalRequests.add(new RentalRequestDTO(
+                        rentalRequest.getId(),
+                        rentalRequest.getStatus().name(),
+                        new PropertyDTO(
+                                rentalRequest.getProperty().getId(),
+                                rentalRequest.getProperty().getAddress(),
+                                rentalRequest.getProperty().getPrice()
+                        ),
+                        null
+                ));
+            }
+        }
+
+        if (tenant.getViewingRequests() != null) {
+            for (ViewingRequest viewingRequest : new HashSet<>(tenant.getViewingRequests())) {
+                viewingRequests.add(new ViewingRequestDTO(
+                        viewingRequest.getId(),
+                        viewingRequest.getStatus().name(),
+                        new PropertyDTO(
+                                viewingRequest.getProperty().getId(),
+                                viewingRequest.getProperty().getAddress(),
+                                viewingRequest.getProperty().getPrice()
+                        ),
+                        null,  // Tenant is not included when returned in TenantController
+                        new AvailabilitySlotDTO(
+                                viewingRequest.getAvailabilitySlot().getId(),
+                                viewingRequest.getAvailabilitySlot().getDayOfWeek(),
+                                viewingRequest.getAvailabilitySlot().getStartHour(),
+                                viewingRequest.getAvailabilitySlot().getEndHour()
+                        )
+                ));
+            }
+        }
+
+        dto.setRentalRequests(rentalRequests);
+        dto.setViewingRequests(viewingRequests);
+
+        return dto;
+    }
+
+    @PostMapping("/{tenantId}/add-rental-request")
+    public ResponseEntity<AppUser> addRentalRequest(@PathVariable Long tenantId, @RequestBody RentalRequest rentalRequest) {
+        System.out.println("\nThe add rental tenant request reached the controller\n");
+        AppUser updatedTenant = tenantService.addRentalRequest(tenantId, rentalRequest);
+        return ResponseEntity.ok(updatedTenant);
+    }
 
     @PostMapping("/{tenantId}/add-viewing-request")
-    public ResponseEntity<String> addViewingRequest(@PathVariable Long tenantId, @RequestBody ViewingRequestDTO request) {
-        try {
-            if (request.getPropertyId() == null || request.getAvailabilitySlotId() == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Property ID and Availability Slot ID are required.");
-            }
-
-            AppUser tenant = appUserRepository.findById(tenantId)
-                    .orElseThrow(() -> new RuntimeException("Tenant not found"));
-
-            Property property = propertyService.getPropertyById(request.getPropertyId());
-            if (property == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Property not found.");
-            }
-
-            AvailabilitySlot availabilitySlot = availabilitySlotRepository.findById(request.getAvailabilitySlotId())
-                    .orElseThrow(() -> new RuntimeException("Availability slot not found"));
-
-            ViewingRequest viewingRequest = new ViewingRequest();
-            viewingRequest.setTenant(tenant);
-            viewingRequest.setProperty(property);
-            viewingRequest.setAvailabilitySlot(availabilitySlot);
-            viewingRequest.setStatus(RequestStatus.PENDING);
-
-            viewingRequestService.createViewingRequest(viewingRequest);
-
-            return ResponseEntity.ok("Viewing request submitted and saved successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing request: " + e.getMessage());
-        }
+    public ResponseEntity<AppUser> addViewingRequest(@PathVariable Long tenantId, @RequestBody ViewingRequest viewingRequest) {
+        System.out.println("\nThe add viewing tenant request reached the controller\n");
+        AppUser updatedTenant = tenantService.addViewingRequest(tenantId, viewingRequest);
+        return ResponseEntity.ok(updatedTenant);
     }
+
 }

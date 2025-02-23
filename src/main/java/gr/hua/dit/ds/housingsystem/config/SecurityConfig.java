@@ -30,6 +30,13 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsServiceImpl userDetailsServiceImpl;
 
+    /*
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+    */
+
     @Bean
     public UserDetailsService userDetailsService() {
         return userDetailsServiceImpl;
@@ -50,6 +57,28 @@ public class SecurityConfig {
         return new CustomAuthenticationSuccessHandler();
     }
 
+    /*
+    @Bean
+    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
+        UserDetails tenant = User.withUsername("tenant")
+                .password(passwordEncoder.encode("tenant"))
+                .roles("TENANT")
+                .build();
+
+        UserDetails owner = User.withUsername("owner")
+                .password(passwordEncoder.encode("owner"))
+                .roles("OWNER")
+                .build();
+
+        UserDetails admin = User.withUsername("admin")
+                .password(passwordEncoder.encode("admin"))
+                .roles("ADMIN")
+                .build();
+
+        return new InMemoryUserDetailsManager(tenant, owner, admin);
+    }
+    */
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -64,10 +93,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(request -> corsConfiguration))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/properties/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/properties/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/tenants/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/tenants/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/properties/**").permitAll() // Viewing open to everyone
                         .requestMatchers(HttpMethod.DELETE, "/api/properties/**").hasAuthority("OWNER") // Only owners can delete
 
                         .requestMatchers("/images/**").permitAll()

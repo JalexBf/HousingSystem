@@ -1,16 +1,20 @@
 package gr.hua.dit.ds.housingsystem.entities.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import gr.hua.dit.ds.housingsystem.entities.enums.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class AppUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,14 +61,30 @@ public class AppUser {
     private boolean approved = false;
 
     //@JsonManagedReference
-    @JsonIgnore
-    @OneToMany(mappedBy = "tenant", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    private Set<RentalRequest> rentalRequests;
+    @JsonManagedReference("user-rental")
+    @OneToMany(mappedBy = "tenant", cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    private Set<RentalRequest> rentalRequests = new HashSet<>();
 
     //@JsonManagedReference
-    @JsonIgnore
-    @OneToMany(mappedBy = "tenant", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    private Set<ViewingRequest> viewingRequests;
+    @JsonManagedReference("user-viewing")
+    @OneToMany(mappedBy = "tenant", cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    private Set<ViewingRequest> viewingRequests = new HashSet<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AppUser appUser = (AppUser) o;
+        return Objects.equals(id, appUser.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
 
     public AppUser() {
     }
@@ -169,6 +189,17 @@ public class AppUser {
     public void setRole(UserRole role) {
         this.role = role;
     }
+
+    public void addRentalRequest(RentalRequest rentalRequest) {
+        rentalRequest.setTenant(this);
+        this.rentalRequests.add(rentalRequest);
+    }
+
+    public void addViewingRequest(ViewingRequest viewingRequest) {
+        viewingRequest.setTenant(this);
+        this.viewingRequests.add(viewingRequest);
+    }
+
 
 }
 

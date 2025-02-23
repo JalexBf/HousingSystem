@@ -23,9 +23,8 @@ public class AdminControllerTest {
 
     @BeforeEach
     public void setup() {
-        adminService = Mockito.mock(AdminService.class); // Manually mock the service
-        adminController = new AdminController(adminService); // Inject mock into controller
-        mockMvc = MockMvcBuilders.standaloneSetup(adminController).build(); // Build MockMvc
+        adminService = Mockito.mock(AdminService.class); // Manually mock service
+        mockMvc = MockMvcBuilders.standaloneSetup(adminController).build();
     }
 
     @Test

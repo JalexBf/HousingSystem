@@ -1,18 +1,20 @@
 package gr.hua.dit.ds.housingsystem.entities.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import gr.hua.dit.ds.housingsystem.entities.enums.PropertyCategory;
 import gr.hua.dit.ds.housingsystem.entities.enums.PropertyFeatures;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-
 
 @Entity
 @Getter
@@ -36,7 +38,7 @@ public class Property {
 
     @Column(nullable = false, unique = true, length = 10)
     @Pattern(regexp = "^[0-9]{10}$", message = "ATAK must be exactly 10 digits.")
-    private String atak;
+    private String atak; // Formerly "registrationNumber"
 
     @Column(nullable = false)
     @Positive(message = "Price must be a positive number.")
@@ -64,7 +66,7 @@ public class Property {
     @Column(nullable = false)
     @Min(value = 1900, message = "Renovation year must be later than 1900.")
     @Max(value = 2100, message = "Renovation year must be earlier than 2100.")
-    private Integer renovationYear;
+    private Integer renovationYear; // Formerly "renovationDate"
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "property_amenities", joinColumns = @JoinColumn(name = "property_id"))
@@ -73,36 +75,51 @@ public class Property {
 
     @JsonIgnore
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference("property-photo")
     private Set<Photo> photos = new HashSet<>();
 
     //@JsonBackReference
-    @JsonIgnore
-    @ManyToOne
+//    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private AppUser owner;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true , fetch = FetchType.LAZY)
-    private Set<ViewingRequest> viewingRequests;
-
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<AvailabilitySlot> availabilitySlots = new HashSet<>();
+    @JsonManagedReference("property-rental")
+    private Set<RentalRequest> rentalRequests = new HashSet<>();
+
+    @JsonManagedReference("property-viewing")
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<ViewingRequest> viewingRequests = new HashSet<>();
+
+    @JsonManagedReference("property-availability")
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<AvailabilitySlot> availabilitySlots;
 
     @Column(nullable = false)
     private boolean approved = false;
 
+    public void addRentalRequest(RentalRequest rentalRequest) {
+        rentalRequest.setProperty(this);
+        this.rentalRequests.add(rentalRequest);
+    }
+
+    public void addViewingRequest(ViewingRequest viewingRequest) {
+        viewingRequest.setProperty(this);
+        this.viewingRequests.add(viewingRequest);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Property)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         Property property = (Property) o;
-        return id != null && id.equals(property.id);
+        return Objects.equals(id, property.id);
     }
 
     @Override
     public int hashCode() {
-        // Use only id for hashCode
-        return getClass().hashCode();
+        return Objects.hash(id);
     }
 
     public Long getId() {

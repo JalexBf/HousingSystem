@@ -21,8 +21,6 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 
     List<Property> findByApproved(boolean approved);
 
-    boolean existsByAtak(String atak);
-
     @Query("SELECT p FROM Property p WHERE " +
             "(:category IS NULL OR p.category = :category) AND " +
             "(:minPrice IS NULL OR p.price >= :minPrice) AND " +

@@ -1,5 +1,6 @@
 package gr.hua.dit.ds.housingsystem.entities.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,8 +16,9 @@ public class Photo {
     @Column(nullable = false)
     private String filePath;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY) // Lazy loading
     @JoinColumn(name = "property_id", nullable = false)
+    @JsonBackReference("property-photo")
     private Property property;
 
     @Override
