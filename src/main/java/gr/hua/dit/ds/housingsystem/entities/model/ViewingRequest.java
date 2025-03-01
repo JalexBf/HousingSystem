@@ -15,17 +15,17 @@ public class ViewingRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Lazy loading
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference("property-viewing")
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Lazy loading
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference("user-viewing")
     @JoinColumn(name = "tenant_id", nullable = false)
     private AppUser tenant;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Lazy loading
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "availability_slot_id", nullable = false)
     @JsonBackReference("availability-viewing")
     private AvailabilitySlot availabilitySlot;

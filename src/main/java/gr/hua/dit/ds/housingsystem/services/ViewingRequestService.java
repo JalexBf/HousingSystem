@@ -16,21 +16,29 @@ public class ViewingRequestService {
     @Autowired
     private ViewingRequestRepository viewingRequestRepository;
 
-    // Updated for owner manage requests
+
     public List<ViewingRequest> getAllViewingRequests() {
         return viewingRequestRepository.findAllWithDetails();
     }
+
 
     @Transactional
     public Optional<ViewingRequest> getViewingRequestById(Long id) {
         return viewingRequestRepository.findById(id);
     }
 
+
+    public List<ViewingRequest> getViewingRequestsByOwnerId(Long ownerId) {
+        return viewingRequestRepository.findByPropertyOwnerId(ownerId);
+    }
+
+
     @Transactional
     public ViewingRequest createViewingRequest(ViewingRequest viewingRequest) {
         viewingRequest.setStatus(RequestStatus.PENDING);
         return viewingRequestRepository.save(viewingRequest);
     }
+
 
     @Transactional
     public ViewingRequest updateViewingRequest(Long id, RequestStatus status) {
@@ -39,6 +47,7 @@ public class ViewingRequestService {
         viewingRequest.setStatus(status);
         return viewingRequestRepository.save(viewingRequest);
     }
+
 
     @Transactional
     public void deleteViewingRequest(Long id) {

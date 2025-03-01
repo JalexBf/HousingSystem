@@ -15,6 +15,8 @@ public interface ViewingRequestRepository extends JpaRepository<ViewingRequest, 
 
     List<ViewingRequest> findByTenantId(Long tenantId);
 
+    List<ViewingRequest> findByPropertyOwnerId(Long ownerId);
+
     List<ViewingRequest> findByStatus(RequestStatus status);
 
     @Query("SELECT vr FROM ViewingRequest vr " +

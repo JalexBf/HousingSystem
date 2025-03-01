@@ -12,6 +12,7 @@ import gr.hua.dit.ds.housingsystem.repositories.PhotoRepository;
 import gr.hua.dit.ds.housingsystem.repositories.PropertyRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +37,7 @@ public class PropertyService {
     private final AvailabilitySlotRepository availabilitySlotRepository;
     private final AppUserRepository appUserRepository;
 
+
     public PropertyService(PropertyRepository propertyRepository, PhotoService photoService,
                            PhotoRepository photoRepository, AvailabilitySlotRepository availabilitySlotRepository, AppUserRepository appUserRepository) {
         this.propertyRepository = propertyRepository;
@@ -55,7 +57,6 @@ public class PropertyService {
         if (property.getAvailabilitySlots() != null) {
             property.getAvailabilitySlots().forEach(slot -> slot.setProperty(property));
         }
-
         return propertyRepository.save(property);
     }
 
@@ -71,7 +72,6 @@ public class PropertyService {
         Property property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new EntityNotFoundException("Property not found"));
 
-        // Create upload directory in user's home
         String userHome = System.getProperty("user.home");
         String fullUploadPath = userHome + File.separator + "property_photos";
         File directory = new File(fullUploadPath);
@@ -80,21 +80,16 @@ public class PropertyService {
                 throw new IOException("Failed to create directory: " + fullUploadPath);
             }
         }
-
         String fileName = prefix + "_" + System.currentTimeMillis() + "_" + property.getId() +
                 "_" + file.getOriginalFilename();
         File destinationFile = new File(directory, fileName);
 
-        // Save the file
         file.transferTo(destinationFile);
-
-        // Create and save the photo entity
         Photo photo = new Photo();
         photo.setFilePath(destinationFile.getAbsolutePath());
         photo.setProperty(property);
         photoRepository.save(photo);
 
-        // Add photo to property's photos collection
         if (property.getPhotos() == null) {
             property.setPhotos(new HashSet<>());
         }
@@ -107,7 +102,6 @@ public class PropertyService {
         if (slots == null || slots.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one availability slot is required.");
         }
-
         Property property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found."));
 
@@ -115,7 +109,6 @@ public class PropertyService {
             validateAvailabilitySlot(slot);
             slot.setProperty(property);
         }
-
         availabilitySlotRepository.saveAll(slots);
     }
 
@@ -128,7 +121,6 @@ public class PropertyService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid time slot. Hours must be between 06:00 and 22:00.");
         }
 
-        // Ensure no overlapping slots exist for the same property
         List<AvailabilitySlot> existingSlots = availabilitySlotRepository.findByPropertyIdAndDayOfWeek(
                 slot.getProperty().getId(), slot.getDayOfWeek());
 
@@ -154,6 +146,12 @@ public class PropertyService {
 
     public List<Property> getPropertiesByOwner(Long ownerId) {
         List<Property> properties = propertyRepository.findByOwnerId(ownerId);
+
+        if (properties != null) {
+            for (Property property : properties) {
+                Hibernate.initialize(property.getAvailabilitySlots());
+            }
+        }
         return properties != null ? properties : new ArrayList<>();
     }
 
@@ -206,6 +204,7 @@ public class PropertyService {
         return propertyRepository.findAvailableProperties(area, parsedDate);
     }
 
+
     @Transactional
     public List<PropertyDTO> getAvailableProperties() {
         List<Property> properties = propertyRepository.findByApproved(true);
@@ -213,6 +212,7 @@ public class PropertyService {
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
+
 
     private PropertyDTO mapToDTO(Property property) {
         PropertyDTO dto = new PropertyDTO();
@@ -223,8 +223,8 @@ public class PropertyService {
         return dto;
     }
 
+
     public Property findById(Long id) {
         return propertyRepository.findById(id).orElse(null);
     }
-
 }
